@@ -1,0 +1,10 @@
+{
+  "name": "midterm-watch-2026",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test test/*.test.mjs",
+    "fetch": "node scripts/fetch-results.mjs",
+    "roster": "node scripts/build-roster.mjs"
+  }
+}

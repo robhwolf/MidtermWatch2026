@@ -1,0 +1,822 @@
+{
+ "checkedOn": "2026-10-31",
+ "states": {
+  "AL": {
+   "state": "AL",
+   "localHours": "7am to 7pm local",
+   "sourceUrl": "https://www.sos.alabama.gov/sites/default/files/election-2026/2026-VoterGuide.pdf",
+   "note": null,
+   "checkedOn": "2026-10-31",
+   "first": "2026-11-04T01:00:00.000Z",
+   "last": "2026-11-04T01:00:00.000Z",
+   "closes": [
+    {
+     "at": "2026-11-04T01:00:00.000Z",
+     "area": "Statewide"
+    }
+   ]
+  },
+  "AK": {
+   "state": "AK",
+   "localHours": "7am to 8pm local",
+   "sourceUrl": "https://www.elections.alaska.gov/Core/electiondatesandhours.php",
+   "note": null,
+   "checkedOn": "2026-10-31",
+   "first": "2026-11-04T05:00:00.000Z",
+   "last": "2026-11-04T06:00:00.000Z",
+   "closes": [
+    {
+     "at": "2026-11-04T05:00:00.000Z",
+     "area": "Most of Alaska"
+    },
+    {
+     "at": "2026-11-04T06:00:00.000Z",
+     "area": "Western Aleutians (Hawaii-Aleutian time)"
+    }
+   ]
+  },
+  "AZ": {
+   "state": "AZ",
+   "localHours": "6am to 7pm",
+   "sourceUrl": "https://azsos.gov/elections/about-elections/elections-procedures/election-day-operations",
+   "note": null,
+   "checkedOn": "2026-10-31",
+   "first": "2026-11-04T02:00:00.000Z",
+   "last": "2026-11-04T02:00:00.000Z",
+   "closes": [
+    {
+     "at": "2026-11-04T02:00:00.000Z",
+     "area": "Statewide"
+    }
+   ]
+  },
+  "AR": {
+   "state": "AR",
+   "localHours": "7:30am to 7:30pm",
+   "sourceUrl": "https://www.sos.arkansas.gov/uploads/elections/2026_Election_Calendar_Rev._6-2025_.pdf",
+   "note": null,
+   "checkedOn": "2026-10-31",
+   "first": "2026-11-04T01:30:00.000Z",
+   "last": "2026-11-04T01:30:00.000Z",
+   "closes": [
+    {
+     "at": "2026-11-04T01:30:00.000Z",
+     "area": "Statewide"
+    }
+   ]
+  },
+  "CA": {
+   "state": "CA",
+   "localHours": "7am to 8pm",
+   "sourceUrl": "https://voterguide.sos.ca.gov/voter-info/dates-to-remember.htm",
+   "note": null,
+   "checkedOn": "2026-10-31",
+   "first": "2026-11-04T04:00:00.000Z",
+   "last": "2026-11-04T04:00:00.000Z",
+   "closes": [
+    {
+     "at": "2026-11-04T04:00:00.000Z",
+     "area": "Statewide"
+    }
+   ]
+  },
+  "CO": {
+   "state": "CO",
+   "localHours": "7am to 7pm",
+   "sourceUrl": "https://www.sos.state.co.us/pubs/elections/calendars/2026ElectionCalendar.pdf",
+   "note": null,
+   "checkedOn": "2026-10-31",
+   "first": "2026-11-04T02:00:00.000Z",
+   "last": "2026-11-04T02:00:00.000Z",
+   "closes": [
+    {
+     "at": "2026-11-04T02:00:00.000Z",
+     "area": "Statewide"
+    }
+   ]
+  },
+  "CT": {
+   "state": "CT",
+   "localHours": "6am to 8pm",
+   "sourceUrl": "https://portal.ct.gov/governor/news/press-releases/2026/10-2026/governor-lamont-and-secretary-thomas-remind-voters-that-a-14-day-period-of-in-person-early-voting",
+   "note": null,
+   "checkedOn": "2026-10-31",
+   "first": "2026-11-04T01:00:00.000Z",
+   "last": "2026-11-04T01:00:00.000Z",
+   "closes": [
+    {
+     "at": "2026-11-04T01:00:00.000Z",
+     "area": "Statewide"
+    }
+   ]
+  },
+  "DE": {
+   "state": "DE",
+   "localHours": "7am to 8pm",
+   "sourceUrl": "https://news.delaware.gov/2026/10/30/voting-alert-general-election-day-november-3-2026-voting-information/",
+   "note": null,
+   "checkedOn": "2026-10-31",
+   "first": "2026-11-04T01:00:00.000Z",
+   "last": "2026-11-04T01:00:00.000Z",
+   "closes": [
+    {
+     "at": "2026-11-04T01:00:00.000Z",
+     "area": "Statewide"
+    }
+   ]
+  },
+  "DC": {
+   "state": "DC",
+   "localHours": "7am to 8pm",
+   "sourceUrl": "https://www.dcboe.org/voters/find-out-where-to-vote/election-day-vote-centers",
+   "note": null,
+   "checkedOn": "2026-10-31",
+   "first": "2026-11-04T01:00:00.000Z",
+   "last": "2026-11-04T01:00:00.000Z",
+   "closes": [
+    {
+     "at": "2026-11-04T01:00:00.000Z",
+     "area": "Citywide"
+    }
+   ]
+  },
+  "FL": {
+   "state": "FL",
+   "localHours": "7am to 7pm local",
+   "sourceUrl": "https://dos.fl.gov/elections/for-voters/voting/election-day-voting/",
+   "note": null,
+   "checkedOn": "2026-10-31",
+   "first": "2026-11-04T00:00:00.000Z",
+   "last": "2026-11-04T01:00:00.000Z",
+   "closes": [
+    {
+     "at": "2026-11-04T00:00:00.000Z",
+     "area": "Eastern time zone"
+    },
+    {
+     "at": "2026-11-04T01:00:00.000Z",
+     "area": "Western Panhandle (Central time)"
+    }
+   ]
+  },
+  "GA": {
+   "state": "GA",
+   "localHours": "7am to 7pm",
+   "sourceUrl": "https://sos.ga.gov/how-to-guide/how-guide-voting",
+   "note": null,
+   "checkedOn": "2026-10-31",
+   "first": "2026-11-04T00:00:00.000Z",
+   "last": "2026-11-04T00:00:00.000Z",
+   "closes": [
+    {
+     "at": "2026-11-04T00:00:00.000Z",
+     "area": "Statewide"
+    }
+   ]
+  },
+  "HI": {
+   "state": "HI",
+   "localHours": "Voting closes 7pm",
+   "sourceUrl": "https://elections.hawaii.gov/voter-service-centers-and-places-of-deposit/",
+   "note": null,
+   "checkedOn": "2026-10-31",
+   "first": "2026-11-04T05:00:00.000Z",
+   "last": "2026-11-04T05:00:00.000Z",
+   "closes": [
+    {
+     "at": "2026-11-04T05:00:00.000Z",
+     "area": "Statewide"
+    }
+   ]
+  },
+  "ID": {
+   "state": "ID",
+   "localHours": "8am to 8pm local",
+   "sourceUrl": "https://voteidaho.gov/idaho-general-election/",
+   "note": null,
+   "checkedOn": "2026-10-31",
+   "first": "2026-11-04T03:00:00.000Z",
+   "last": "2026-11-04T04:00:00.000Z",
+   "closes": [
+    {
+     "at": "2026-11-04T03:00:00.000Z",
+     "area": "Mountain time zone"
+    },
+    {
+     "at": "2026-11-04T04:00:00.000Z",
+     "area": "Northern Idaho (Pacific time)"
+    }
+   ]
+  },
+  "IL": {
+   "state": "IL",
+   "localHours": "6am to 7pm",
+   "sourceUrl": "https://votersguide.elections.il.gov/FAQs",
+   "note": null,
+   "checkedOn": "2026-10-31",
+   "first": "2026-11-04T01:00:00.000Z",
+   "last": "2026-11-04T01:00:00.000Z",
+   "closes": [
+    {
+     "at": "2026-11-04T01:00:00.000Z",
+     "area": "Statewide"
+    }
+   ]
+  },
+  "IN": {
+   "state": "IN",
+   "localHours": "6am to 6pm local",
+   "sourceUrl": "https://www.in.gov/sos/elections/files/2026-Calendar-Brochure.FINAL-VERSION.pdf",
+   "note": null,
+   "checkedOn": "2026-10-31",
+   "first": "2026-11-03T23:00:00.000Z",
+   "last": "2026-11-04T00:00:00.000Z",
+   "closes": [
+    {
+     "at": "2026-11-03T23:00:00.000Z",
+     "area": "Eastern time zone"
+    },
+    {
+     "at": "2026-11-04T00:00:00.000Z",
+     "area": "Northwest and southwest counties (Central time)"
+    }
+   ]
+  },
+  "IA": {
+   "state": "IA",
+   "localHours": "7am to 8pm",
+   "sourceUrl": "https://blackhawkcountyelections.iowa.gov/elections/info/2026_general_election_2026_11_03/",
+   "note": "The state site blocked checks, so this is a county election office page; other Iowa counties match.",
+   "checkedOn": "2026-10-31",
+   "first": "2026-11-04T02:00:00.000Z",
+   "last": "2026-11-04T02:00:00.000Z",
+   "closes": [
+    {
+     "at": "2026-11-04T02:00:00.000Z",
+     "area": "Statewide"
+    }
+   ]
+  },
+  "KS": {
+   "state": "KS",
+   "localHours": "7am to 7pm local by default; counties may run 6am to 8pm",
+   "sourceUrl": "https://sos.ks.gov/elections/voter-information.html",
+   "note": null,
+   "checkedOn": "2026-10-31",
+   "first": "2026-11-04T01:00:00.000Z",
+   "last": "2026-11-04T02:00:00.000Z",
+   "closes": [
+    {
+     "at": "2026-11-04T01:00:00.000Z",
+     "area": "Central time zone, default close"
+    },
+    {
+     "at": "2026-11-04T02:00:00.000Z",
+     "area": "Greeley, Hamilton, Sherman and Wallace counties (Mountain time); latest county closes"
+    }
+   ]
+  },
+  "KY": {
+   "state": "KY",
+   "localHours": "6am to 6pm local",
+   "sourceUrl": "https://elect.ky.gov/Frequently-Asked-Questions/Pages/Election-Day-Information.aspx",
+   "note": null,
+   "checkedOn": "2026-10-31",
+   "first": "2026-11-03T23:00:00.000Z",
+   "last": "2026-11-04T00:00:00.000Z",
+   "closes": [
+    {
+     "at": "2026-11-03T23:00:00.000Z",
+     "area": "Eastern time zone"
+    },
+    {
+     "at": "2026-11-04T00:00:00.000Z",
+     "area": "Western Kentucky (Central time)"
+    }
+   ]
+  },
+  "LA": {
+   "state": "LA",
+   "localHours": "6am to 8pm",
+   "sourceUrl": "https://www.sos.la.gov/elections-voting/election-dates",
+   "note": null,
+   "checkedOn": "2026-10-31",
+   "first": "2026-11-04T02:00:00.000Z",
+   "last": "2026-11-04T02:00:00.000Z",
+   "closes": [
+    {
+     "at": "2026-11-04T02:00:00.000Z",
+     "area": "Statewide"
+    }
+   ]
+  },
+  "ME": {
+   "state": "ME",
+   "localHours": "Closes 8pm",
+   "sourceUrl": "https://legislature.maine.gov/statutes/21-A/title21-Asec626.html",
+   "note": null,
+   "checkedOn": "2026-10-31",
+   "first": "2026-11-04T01:00:00.000Z",
+   "last": "2026-11-04T01:00:00.000Z",
+   "closes": [
+    {
+     "at": "2026-11-04T01:00:00.000Z",
+     "area": "Statewide"
+    }
+   ]
+  },
+  "MD": {
+   "state": "MD",
+   "localHours": "7am to 8pm",
+   "sourceUrl": "https://elections.maryland.gov/voting/index.html",
+   "note": null,
+   "checkedOn": "2026-10-31",
+   "first": "2026-11-04T01:00:00.000Z",
+   "last": "2026-11-04T01:00:00.000Z",
+   "closes": [
+    {
+     "at": "2026-11-04T01:00:00.000Z",
+     "area": "Statewide"
+    }
+   ]
+  },
+  "MA": {
+   "state": "MA",
+   "localHours": "7am to 8pm",
+   "sourceUrl": "https://www.sec.state.ma.us/divisions/elections/voting-information/polling-hours.htm",
+   "note": null,
+   "checkedOn": "2026-10-31",
+   "first": "2026-11-04T01:00:00.000Z",
+   "last": "2026-11-04T01:00:00.000Z",
+   "closes": [
+    {
+     "at": "2026-11-04T01:00:00.000Z",
+     "area": "Statewide"
+    }
+   ]
+  },
+  "MI": {
+   "state": "MI",
+   "localHours": "7am to 8pm local",
+   "sourceUrl": "https://www.michigan.gov/sos/elections/voting/vote-on-election-day",
+   "note": null,
+   "checkedOn": "2026-10-31",
+   "first": "2026-11-04T01:00:00.000Z",
+   "last": "2026-11-04T02:00:00.000Z",
+   "closes": [
+    {
+     "at": "2026-11-04T01:00:00.000Z",
+     "area": "Eastern time zone"
+    },
+    {
+     "at": "2026-11-04T02:00:00.000Z",
+     "area": "Dickinson, Gogebic, Iron and Menominee counties (Central time)"
+    }
+   ]
+  },
+  "MN": {
+   "state": "MN",
+   "localHours": "Closes 8pm",
+   "sourceUrl": "https://www.sos.mn.gov/elections-voting/election-day-voting/voting-hours/",
+   "note": null,
+   "checkedOn": "2026-10-31",
+   "first": "2026-11-04T02:00:00.000Z",
+   "last": "2026-11-04T02:00:00.000Z",
+   "closes": [
+    {
+     "at": "2026-11-04T02:00:00.000Z",
+     "area": "Statewide"
+    }
+   ]
+  },
+  "MS": {
+   "state": "MS",
+   "localHours": "7am to 7pm",
+   "sourceUrl": "https://www.sos.ms.gov/sites/default/files/elections/2026%20Mississippi%20Voter%20Information%20Guide.pdf",
+   "note": null,
+   "checkedOn": "2026-10-31",
+   "first": "2026-11-04T01:00:00.000Z",
+   "last": "2026-11-04T01:00:00.000Z",
+   "closes": [
+    {
+     "at": "2026-11-04T01:00:00.000Z",
+     "area": "Statewide"
+    }
+   ]
+  },
+  "MO": {
+   "state": "MO",
+   "localHours": "6am to 7pm",
+   "sourceUrl": "https://www.sos.mo.gov/CMSImages/ElectionCandidates/2026GeneralElectionCertifiedCandidates.pdf",
+   "note": null,
+   "checkedOn": "2026-10-31",
+   "first": "2026-11-04T01:00:00.000Z",
+   "last": "2026-11-04T01:00:00.000Z",
+   "closes": [
+    {
+     "at": "2026-11-04T01:00:00.000Z",
+     "area": "Statewide"
+    }
+   ]
+  },
+  "MT": {
+   "state": "MT",
+   "localHours": "7am to 8pm",
+   "sourceUrl": "https://leg.mt.gov/bills/mca/title_0130/chapter_0010/part_0010/section_0060/0130-0010-0010-0060.html",
+   "note": "Hours from state statute; no November notice from the Secretary of State was found.",
+   "checkedOn": "2026-10-31",
+   "first": "2026-11-04T03:00:00.000Z",
+   "last": "2026-11-04T03:00:00.000Z",
+   "closes": [
+    {
+     "at": "2026-11-04T03:00:00.000Z",
+     "area": "Statewide"
+    }
+   ]
+  },
+  "NE": {
+   "state": "NE",
+   "localHours": "8pm Central, 7pm Mountain",
+   "sourceUrl": "https://sos.nebraska.gov/sites/default/files/doc/elections/2026/2026_Election_Calendar.pdf",
+   "note": null,
+   "checkedOn": "2026-10-31",
+   "first": "2026-11-04T02:00:00.000Z",
+   "last": "2026-11-04T02:00:00.000Z",
+   "closes": [
+    {
+     "at": "2026-11-04T02:00:00.000Z",
+     "area": "Statewide; both time zones close together"
+    }
+   ]
+  },
+  "NV": {
+   "state": "NV",
+   "localHours": "7am to 7pm",
+   "sourceUrl": "https://www.nvsos.gov/Home/Components/News/News/3800/23",
+   "note": null,
+   "checkedOn": "2026-10-31",
+   "first": "2026-11-04T03:00:00.000Z",
+   "last": "2026-11-04T03:00:00.000Z",
+   "closes": [
+    {
+     "at": "2026-11-04T03:00:00.000Z",
+     "area": "Statewide"
+    }
+   ]
+  },
+  "NH": {
+   "state": "NH",
+   "localHours": "Set locally; no earlier than 7pm",
+   "sourceUrl": "https://gc.nh.gov/rsa/html/lxiii/659/659-mrg.htm?id=8589979037",
+   "note": "The state sets a 7pm minimum only. The 8pm last close comes from NYT and Green Papers listings, not a state page.",
+   "checkedOn": "2026-10-31",
+   "first": "2026-11-04T00:00:00.000Z",
+   "last": "2026-11-04T01:00:00.000Z",
+   "closes": [
+    {
+     "at": "2026-11-04T00:00:00.000Z",
+     "area": "Most towns"
+    },
+    {
+     "at": "2026-11-04T01:00:00.000Z",
+     "area": "Some cities and towns stay open later"
+    }
+   ]
+  },
+  "NJ": {
+   "state": "NJ",
+   "localHours": "6am to 8pm",
+   "sourceUrl": "https://www.nj.gov/state/elections/assets/pdf/flyer-how-to-vote/2026-11-how-to-vote-english.pdf",
+   "note": null,
+   "checkedOn": "2026-10-31",
+   "first": "2026-11-04T01:00:00.000Z",
+   "last": "2026-11-04T01:00:00.000Z",
+   "closes": [
+    {
+     "at": "2026-11-04T01:00:00.000Z",
+     "area": "Statewide"
+    }
+   ]
+  },
+  "NM": {
+   "state": "NM",
+   "localHours": "7am to 7pm",
+   "sourceUrl": "https://www.sos.nm.gov/2026/10/29/new-mexico-secretary-of-states-office-issues-election-advisory-in-light-of-recent-extreme-weather-events/",
+   "note": null,
+   "checkedOn": "2026-10-31",
+   "first": "2026-11-04T02:00:00.000Z",
+   "last": "2026-11-04T02:00:00.000Z",
+   "closes": [
+    {
+     "at": "2026-11-04T02:00:00.000Z",
+     "area": "Statewide"
+    }
+   ]
+  },
+  "NY": {
+   "state": "NY",
+   "localHours": "6am to 9pm",
+   "sourceUrl": "https://elections.ny.gov/election-information",
+   "note": null,
+   "checkedOn": "2026-10-31",
+   "first": "2026-11-04T02:00:00.000Z",
+   "last": "2026-11-04T02:00:00.000Z",
+   "closes": [
+    {
+     "at": "2026-11-04T02:00:00.000Z",
+     "area": "Statewide"
+    }
+   ]
+  },
+  "NC": {
+   "state": "NC",
+   "localHours": "6:30am to 7:30pm",
+   "sourceUrl": "https://www.ncsbe.gov/news/press-releases/2026/10/27/reporters-primer-2026-general-election-nc",
+   "note": "The State Board can extend hours at individual sites on the day.",
+   "checkedOn": "2026-10-31",
+   "first": "2026-11-04T00:30:00.000Z",
+   "last": "2026-11-04T00:30:00.000Z",
+   "closes": [
+    {
+     "at": "2026-11-04T00:30:00.000Z",
+     "area": "Statewide"
+    }
+   ]
+  },
+  "ND": {
+   "state": "ND",
+   "localHours": "Set by county; close between 7pm and 9pm local",
+   "sourceUrl": "https://vip.sos.nd.gov/precincts.aspx?eid=329",
+   "note": "Each county sets its hours. These are the legal limits; many counties close at 7pm local.",
+   "checkedOn": "2026-10-31",
+   "first": "2026-11-04T01:00:00.000Z",
+   "last": "2026-11-04T04:00:00.000Z",
+   "closes": [
+    {
+     "at": "2026-11-04T01:00:00.000Z",
+     "area": "Earliest Central time counties"
+    },
+    {
+     "at": "2026-11-04T03:00:00.000Z",
+     "area": "Latest Central time counties"
+    },
+    {
+     "at": "2026-11-04T04:00:00.000Z",
+     "area": "Latest Mountain time counties"
+    }
+   ]
+  },
+  "OH": {
+   "state": "OH",
+   "localHours": "6:30am to 7:30pm",
+   "sourceUrl": "https://www.ohiosos.gov/office/media-center/categories/press-releases/2026-10-05",
+   "note": null,
+   "checkedOn": "2026-10-31",
+   "first": "2026-11-04T00:30:00.000Z",
+   "last": "2026-11-04T00:30:00.000Z",
+   "closes": [
+    {
+     "at": "2026-11-04T00:30:00.000Z",
+     "area": "Statewide"
+    }
+   ]
+  },
+  "OK": {
+   "state": "OK",
+   "localHours": "7am to 7pm",
+   "sourceUrl": "https://oklahoma.gov/elections/elections-results/next-election.html",
+   "note": null,
+   "checkedOn": "2026-10-31",
+   "first": "2026-11-04T01:00:00.000Z",
+   "last": "2026-11-04T01:00:00.000Z",
+   "closes": [
+    {
+     "at": "2026-11-04T01:00:00.000Z",
+     "area": "Statewide"
+    }
+   ]
+  },
+  "OR": {
+   "state": "OR",
+   "localHours": "Ballots due 8pm local",
+   "sourceUrl": "https://sos.oregon.gov/elections/Documents/GE26-Oregon-Drop-Sites.pdf",
+   "note": null,
+   "checkedOn": "2026-10-31",
+   "first": "2026-11-04T03:00:00.000Z",
+   "last": "2026-11-04T04:00:00.000Z",
+   "closes": [
+    {
+     "at": "2026-11-04T03:00:00.000Z",
+     "area": "Malheur County (Mountain time)"
+    },
+    {
+     "at": "2026-11-04T04:00:00.000Z",
+     "area": "Rest of Oregon"
+    }
+   ]
+  },
+  "PA": {
+   "state": "PA",
+   "localHours": "7am to 8pm",
+   "sourceUrl": "https://www.pa.gov/agencies/vote/elections/upcoming-elections",
+   "note": null,
+   "checkedOn": "2026-10-31",
+   "first": "2026-11-04T01:00:00.000Z",
+   "last": "2026-11-04T01:00:00.000Z",
+   "closes": [
+    {
+     "at": "2026-11-04T01:00:00.000Z",
+     "area": "Statewide"
+    }
+   ]
+  },
+  "RI": {
+   "state": "RI",
+   "localHours": "7am to 8pm",
+   "sourceUrl": "https://elections.ri.gov/polling-hours",
+   "note": null,
+   "checkedOn": "2026-10-31",
+   "first": "2026-11-04T01:00:00.000Z",
+   "last": "2026-11-04T01:00:00.000Z",
+   "closes": [
+    {
+     "at": "2026-11-04T01:00:00.000Z",
+     "area": "Statewide"
+    }
+   ]
+  },
+  "SC": {
+   "state": "SC",
+   "localHours": "7am to 7pm",
+   "sourceUrl": "https://scvotes.gov/voters/2026prep/",
+   "note": null,
+   "checkedOn": "2026-10-31",
+   "first": "2026-11-04T00:00:00.000Z",
+   "last": "2026-11-04T00:00:00.000Z",
+   "closes": [
+    {
+     "at": "2026-11-04T00:00:00.000Z",
+     "area": "Statewide"
+    }
+   ]
+  },
+  "SD": {
+   "state": "SD",
+   "localHours": "7am to 7pm local",
+   "sourceUrl": "https://sdsos.gov/elections-voting/voting/default.aspx",
+   "note": null,
+   "checkedOn": "2026-10-31",
+   "first": "2026-11-04T01:00:00.000Z",
+   "last": "2026-11-04T02:00:00.000Z",
+   "closes": [
+    {
+     "at": "2026-11-04T01:00:00.000Z",
+     "area": "Central time zone"
+    },
+    {
+     "at": "2026-11-04T02:00:00.000Z",
+     "area": "Western South Dakota (Mountain time)"
+    }
+   ]
+  },
+  "TN": {
+   "state": "TN",
+   "localHours": "Closes 8pm Eastern, 7pm Central",
+   "sourceUrl": "https://sos.tn.gov/newsroom/press-releases/everything-voters-need-to-know-for-the-august-6-election-this-thursday",
+   "note": "Latest notice is for the August election; closing times are set by statute.",
+   "checkedOn": "2026-10-31",
+   "first": "2026-11-04T01:00:00.000Z",
+   "last": "2026-11-04T01:00:00.000Z",
+   "closes": [
+    {
+     "at": "2026-11-04T01:00:00.000Z",
+     "area": "Statewide; both time zones close together"
+    }
+   ]
+  },
+  "TX": {
+   "state": "TX",
+   "localHours": "7am to 7pm local",
+   "sourceUrl": "https://www.sos.texas.gov/about/newsreleases/2026/102726.shtml",
+   "note": null,
+   "checkedOn": "2026-10-31",
+   "first": "2026-11-04T01:00:00.000Z",
+   "last": "2026-11-04T02:00:00.000Z",
+   "closes": [
+    {
+     "at": "2026-11-04T01:00:00.000Z",
+     "area": "Central time zone"
+    },
+    {
+     "at": "2026-11-04T02:00:00.000Z",
+     "area": "El Paso and Hudspeth counties (Mountain time)"
+    }
+   ]
+  },
+  "UT": {
+   "state": "UT",
+   "localHours": "7am to 8pm",
+   "sourceUrl": "https://www.utah.gov/pmn/files/1496457.pdf",
+   "note": "Salt Lake County notice; other county notices match.",
+   "checkedOn": "2026-10-31",
+   "first": "2026-11-04T03:00:00.000Z",
+   "last": "2026-11-04T03:00:00.000Z",
+   "closes": [
+    {
+     "at": "2026-11-04T03:00:00.000Z",
+     "area": "Statewide"
+    }
+   ]
+  },
+  "VT": {
+   "state": "VT",
+   "localHours": "Closes 7pm",
+   "sourceUrl": "https://sos.vermont.gov/elections/voters/voter-faqs",
+   "note": null,
+   "checkedOn": "2026-10-31",
+   "first": "2026-11-04T00:00:00.000Z",
+   "last": "2026-11-04T00:00:00.000Z",
+   "closes": [
+    {
+     "at": "2026-11-04T00:00:00.000Z",
+     "area": "Statewide"
+    }
+   ]
+  },
+  "VA": {
+   "state": "VA",
+   "localHours": "6am to 7pm",
+   "sourceUrl": "https://www.elections.virginia.gov/casting-a-ballot/",
+   "note": null,
+   "checkedOn": "2026-10-31",
+   "first": "2026-11-04T00:00:00.000Z",
+   "last": "2026-11-04T00:00:00.000Z",
+   "closes": [
+    {
+     "at": "2026-11-04T00:00:00.000Z",
+     "area": "Statewide"
+    }
+   ]
+  },
+  "WA": {
+   "state": "WA",
+   "localHours": "Ballots due 8pm",
+   "sourceUrl": "https://www.sos.wa.gov/elections/elections-calendar/dates-and-deadlines",
+   "note": null,
+   "checkedOn": "2026-10-31",
+   "first": "2026-11-04T04:00:00.000Z",
+   "last": "2026-11-04T04:00:00.000Z",
+   "closes": [
+    {
+     "at": "2026-11-04T04:00:00.000Z",
+     "area": "Statewide"
+    }
+   ]
+  },
+  "WV": {
+   "state": "WV",
+   "localHours": "6:30am to 7:30pm",
+   "sourceUrl": "https://sos.wv.gov/media/467/download?inline=",
+   "note": null,
+   "checkedOn": "2026-10-31",
+   "first": "2026-11-04T00:30:00.000Z",
+   "last": "2026-11-04T00:30:00.000Z",
+   "closes": [
+    {
+     "at": "2026-11-04T00:30:00.000Z",
+     "area": "Statewide"
+    }
+   ]
+  },
+  "WI": {
+   "state": "WI",
+   "localHours": "7am to 8pm",
+   "sourceUrl": "https://elections.wi.gov/news/last-minute-reminders-ahead-tuesdays-election",
+   "note": null,
+   "checkedOn": "2026-10-31",
+   "first": "2026-11-04T02:00:00.000Z",
+   "last": "2026-11-04T02:00:00.000Z",
+   "closes": [
+    {
+     "at": "2026-11-04T02:00:00.000Z",
+     "area": "Statewide"
+    }
+   ]
+  },
+  "WY": {
+   "state": "WY",
+   "localHours": "7am to 7pm",
+   "sourceUrl": "https://sos.wyo.gov/Elections/Docs/2026/2026_Election_Calendar.pdf",
+   "note": null,
+   "checkedOn": "2026-10-31",
+   "first": "2026-11-04T02:00:00.000Z",
+   "last": "2026-11-04T02:00:00.000Z",
+   "closes": [
+    {
+     "at": "2026-11-04T02:00:00.000Z",
+     "area": "Statewide"
+    }
+   ]
+  }
+ }
+}

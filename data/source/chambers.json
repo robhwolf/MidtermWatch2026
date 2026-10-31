@@ -1,0 +1,8 @@
+{
+  "house": { "seats": 435, "toWin": { "D": 218, "R": 218 }, "holdover": { "D": 0, "R": 0, "I": 0 } },
+  "senate": { "seats": 100, "toWin": { "D": 51, "R": 50 }, "holdover": { "D": 34, "R": 31, "I": 0 },
+    "note": "Republicans control a 50-50 Senate through the Vice President's tie-break. Sanders and King count with Democrats." },
+  "governor": { "seats": 50, "up": 36 },
+  "source": "NYT party control data, 2026-10-28",
+  "sourceUrl": "https://static01.nyt.com/elections-assets/pages/data/2026-11-03/results-senate.json"
+}

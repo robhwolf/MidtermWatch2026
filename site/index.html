@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Midterm Watch 2026</title>
+<meta name="description" content="House, Senate and governor races in the 2026 midterms, read against Cook's ratings.">
+<meta name="theme-color" content="#f3f5ee" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#141c18" media="(prefers-color-scheme: dark)">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;800&family=Schibsted+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<a class="skip" href="#balance">Skip to the seat count</a>
+<header class="mast">
+  <div class="wrap mast-row">
+    <h1>Midterm Watch <span>2026</span></h1>
+    <p id="updated" class="updated" aria-live="polite">Loading results</p>
+  </div>
+  <nav class="wrap jump" aria-label="Sections">
+    <a href="#balance">Seats</a>
+    <a href="#races">Races</a>
+    <a href="#upsets">Upsets</a>
+    <a href="#night">Tonight</a>
+    <a href="#path">Path</a>
+    <a href="#swing">Swing</a>
+  </nav>
+</header>
+
+<div id="alerts" class="wrap alerts"></div>
+
+<main class="wrap">
+  <section id="balance" aria-label="Balance of power">
+    <div id="chambers"></div>
+    <div id="governors" class="governors"></div>
+    <div id="latest" class="latest"></div>
+  </section>
+
+  <section id="races">
+    <h2>Every race</h2>
+    <div class="map-block">
+      <div class="seg" id="map-chamber" role="group" aria-label="Map shows">
+        <button data-v="senate" aria-pressed="true">Senate</button>
+        <button data-v="house" aria-pressed="false">House</button>
+        <button data-v="governor" aria-pressed="false">Governors</button>
+      </div>
+      <div id="map" class="map"></div>
+      <div id="map-key" class="key"></div>
+    </div>
+    <form id="filters" class="filters">
+      <label>Chamber
+        <select name="chamber">
+          <option value="">All</option><option value="senate">Senate</option>
+          <option value="house">House</option><option value="governor">Governor</option>
+        </select>
+      </label>
+      <label>State <select name="state"><option value="">All</option></select></label>
+      <label>Cook rating <select name="rating"></select></label>
+      <label>Status
+        <select name="status">
+          <option value="">All</option><option value="called">Called</option>
+          <option value="counting">Counting</option><option value="pending">No votes yet</option>
+          <option value="runoff">Runoff</option>
+        </select>
+      </label>
+      <label class="grow">Find <input name="q" type="search" placeholder="Name or race" autocomplete="off"></label>
+    </form>
+    <p id="count" class="count" aria-live="polite"></p>
+    <div class="scroll"><table id="table"></table></div>
+    <button id="more" class="more" type="button" hidden>Show more races</button>
+  </section>
+
+  <section id="upsets">
+    <h2>Called against the forecast</h2>
+    <div id="upset-list"></div>
+    <h3>Toss-ups</h3>
+    <div id="tossups" class="tossups"></div>
+  </section>
+
+  <section id="night">
+    <h2>The night, by poll closing</h2>
+    <p class="lede">Polls close first in the east. The highlighted races are Toss-up and Lean seats in the earliest states, the first real evidence of the night.</p>
+    <div id="timeline" class="timeline"></div>
+  </section>
+
+  <section id="path">
+    <h2>Path to a majority</h2>
+    <div id="path-grid" class="path-grid"></div>
+  </section>
+
+  <section id="swing">
+    <h2>Swing against the last election</h2>
+    <div id="swing-avg" class="swing-avg"></div>
+    <div id="swing-chart"></div>
+  </section>
+
+  <section id="markets" hidden>
+    <h2>Prediction markets</h2>
+    <p class="lede">Traders' implied odds of each party winning control, over the night. These are prices, not results.</p>
+    <div id="market-chart"></div>
+  </section>
+</main>
+
+<footer class="wrap foot">
+  <h2>Where this comes from</h2>
+  <div id="sources"></div>
+  <details>
+    <summary>Poll closing sources, state by state</summary>
+    <div id="closing-sources"></div>
+  </details>
+  <p class="fine">A personal project. Ratings are The Cook Political Report's, entered by hand. Race calls come from the sources named on each race. Times are Eastern Time (ET).</p>
+</footer>
+
+<script type="module" src="js/app.js"></script>
+</body>
+</html>

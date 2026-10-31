@@ -1,0 +1,400 @@
+import {
+  RATING_ORDER, averageSwing, balance, bellwethers, dayTimeET, governors, isStale, isTossup, isUpset, isWatched,
+  leader, margin, path, pollGroups, ratingParty, recentCalls, standing, staleLimitMinutes, swing, timeET,
+} from './model.js';
+import { Meadow } from './meadow.js';
+import { renderMap } from './pebbles.js';
+
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const safeUrl = u => (/^https?:\/\//.test(u || '') ? esc(u) : null);
+const link = (u, text) => (safeUrl(u) ? `<a href="${safeUrl(u)}" rel="noopener">${esc(text)}</a>` : esc(text));
+const pty = p => `<span class="pty ${esc(p)}" title="${{ D: 'Democrat', R: 'Republican', I: 'Independent or other' }[p] || ''}">${esc(p)}</span>`;
+const plural = (n, w) => `${n} ${w}${n === 1 ? '' : 's'}`;
+const signed = n => (n == null ? '–' : n === 0 ? 'Even' : `${n > 0 ? 'D' : 'R'}+${Math.abs(n).toFixed(1)}`);
+
+const sample = new URLSearchParams(location.search).get('sample');
+const DATA = sample && /^(pre|mid|final)$/.test(sample) ? `data/sample-${sample}.json` : 'data/results.json';
+const REFRESH_MS = 60000;
+const PAGE = 40;
+
+let doc = null, lastGood = null, loadError = null;
+let filters = { chamber: '', state: '', rating: 'competitive', status: '', q: '' };
+let mapChamber = 'senate', shown = PAGE, sortKey = 'default', openRow = null;
+const meadows = {};
+let knownCalls = null;
+
+function raceName(r) {
+  if (r.chamber === 'house') return `${r.state}-${r.atLarge ? 'AL' : r.district}`;
+  return `${r.state} ${r.chamber === 'senate' ? (r.special ? 'Senate (special)' : 'Senate') : 'Governor'}`;
+}
+
+function ratingChip(c) {
+  if (!c?.rating) return '<span class="rate assumed">Not rated</span>';
+  if (c.assumed) return `<span class="rate assumed" title="No Cook rating entered; assumed from the seat holder">${esc(c.rating)}*</span>`;
+  const [bg, fg] = ratingColors(c.rating);
+  return `<span class="rate" style="--chip:${bg};--chip-ink:${fg}">${esc(c.rating)}</span>`;
+}
+
+function ratingColors(rating) {
+  return {
+    'Solid D': ['var(--d)', '#fff'], 'Likely D': ['var(--d-soft)', 'var(--ink)'], 'Lean D': ['var(--d-wash)', 'var(--ink)'],
+    'Toss-up': ['var(--toss)', 'var(--ink)'],
+    'Lean R': ['var(--r-wash)', 'var(--ink)'], 'Likely R': ['var(--r-soft)', 'var(--ink)'], 'Solid R': ['var(--r)', '#fff'],
+  }[rating] || ['var(--rule)', 'var(--ink)'];
+}
+
+/* Header and alerts */
+function renderStatus() {
+  const now = Date.now();
+  const at = doc?.generatedAt;
+  $('updated').textContent = at ? `Updated ${dayTimeET(at)}` : 'Waiting for the first update';
+  const alerts = [];
+  if (doc?.sample) alerts.push(`Sample data. Every number on this page is invented for testing. <a href="./">See live results</a>`);
+  if (loadError) alerts.push('Could not reach the latest results. Showing the last ones loaded.');
+  if (at && !doc.sample && isStale(at, now)) {
+    const mins = Math.round((now - Date.parse(at)) / 60000);
+    alerts.push(`These results are ${mins >= 120 ? `${Math.round(mins / 60)} hours` : `${mins} minutes`} old, past the ${staleLimitMinutes(now)}-minute limit. The update job may be delayed.`);
+  }
+  const down = (doc?.sources || []).filter(s => !s.ok && s.role === 'feed');
+  if (down.length) alerts.push(`Source down: ${down.map(s => esc(s.name)).join(', ')}. Using the backup.`);
+  const carried = (doc?.races || []).filter(r => r.carried).length;
+  if (carried > 20) alerts.push(`${carried} races are showing their last known count because no source returned them.`);
+  $('alerts').innerHTML = alerts.map(a => `<p class="alert" role="status">${a}</p>`).join('');
+}
+
+/* Balance of power */
+function renderBalance() {
+  const host = $('chambers');
+  for (const key of ['house', 'senate']) {
+    const label = key === 'house' ? 'House' : 'Senate';
+    if (!meadows[key]) {
+      host.insertAdjacentHTML('beforeend', `<article class="chamber" id="c-${key}"><div class="head-slot"></div>
+        <canvas class="meadow ${key}-meadow" role="img"></canvas><div class="foot-slot"></div></article>`);
+      meadows[key] = new Meadow(host.querySelector(`#c-${key} canvas`), label);
+    }
+    const cfg = doc.chambers[key];
+    const b = balance(doc.races, key, cfg);
+    const el = $(`c-${key}`);
+    const goal = key === 'senate' ? `<strong>D 51 · R 50</strong><span>to control the Senate</span>` : `<strong>218</strong><span>to win the House</span>`;
+    el.querySelector('.head-slot').innerHTML = `<div class="chamber-head">
+      <div class="tally D"><b>${b.won.D}</b><small>Dem<br>${b.leading.D ? `+${b.leading.D} ahead` : ''}</small></div>
+      <div class="goal"><h2>${label}</h2>${goal}</div>
+      <div class="tally R right"><small>Rep<br>${b.leading.R ? `+${b.leading.R} ahead` : ''}</small><b>${b.won.R}</b></div></div>`;
+    const cv = el.querySelector('canvas');
+    cv.setAttribute('aria-label', `${label}: Democrats ${b.won.D} won, ${b.leading.D} leading. Republicans ${b.won.R} won, ${b.leading.R} leading. ${b.uncalled} uncalled.`);
+    meadows[key].set(b);
+    const flips = b.flips.D + b.flips.R;
+    const other = b.won.I + b.leading.I;
+    el.querySelector('.foot-slot').innerHTML = `<div class="chamber-foot">
+      <span><strong>${b.uncalled}</strong> uncalled${other ? ` · <strong>${other}</strong> independent` : ''}${key === 'senate' ? ` · ${b.holdover.D + b.holdover.R} not up this year` : ''}</span>
+      <span>${flips ? `Flipped: <strong>${b.flips.D} to D, ${b.flips.R} to R</strong>` : 'No seats flipped yet'}</span></div>${cookStrip(key)}`;
+  }
+  const g = governors(doc.races);
+  $('governors').innerHTML = `<h2>Governors</h2>
+    <span class="D"><b>${g.won.D}</b> Dem${g.leading.D ? `, +${g.leading.D} ahead` : ''}</span>
+    <span class="R"><b>${g.won.R}</b> Rep${g.leading.R ? `, +${g.leading.R} ahead` : ''}</span>
+    ${g.won.I ? `<span><b>${g.won.I}</b> Ind</span>` : ''}
+    <span>${g.uncalled} of ${g.total} races uncalled</span>`;
+
+  const calls = recentCalls(doc.races);
+  $('latest').innerHTML = `<h2>Latest calls</h2>` + (calls.length
+    ? calls.map(r => `<div class="call">${pty(r.call.party)}<span><a href="#races" data-race="${esc(r.id)}">${esc(raceName(r))}</a>: ${esc(r.call.name)}</span>
+        <time>${timeET(r.firstCalledAt)}</time></div>`).join('')
+    : `<p>No races called yet. First polls close at 6 pm ET on Tuesday.</p>`);
+}
+
+function cookStrip(chamber) {
+  const list = doc.races.filter(r => r.chamber === chamber);
+  const rated = list.filter(r => r.cook?.rating && !r.cook.assumed);
+  if (!rated.length) return `<p class="cook-note">Cook ratings not entered yet.</p>`;
+  const seg = RATING_ORDER.map(k => {
+    const n = list.filter(r => r.cook?.rating === k).length;
+    return n ? `<i title="${k}: ${n}" style="flex:${n};background:${ratingColors(k)[0]}"></i>` : '';
+  }).join('');
+  const assumed = list.filter(r => r.cook?.assumed).length;
+  return `<div class="cook-strip" aria-hidden="true">${seg}</div><p class="cook-note">Cook ratings, safest Democratic to safest Republican: ${rated.length} entered${assumed ? `, ${assumed} assumed Solid for the seat holder` : ''}.</p>`;
+}
+
+/* Map. Uncalled seats only ever use the soft shades, so a favourite can't be
+   mistaken for a win. */
+const FAVOURED = {
+  'Solid D': 'var(--d-soft)', 'Likely D': 'var(--d-soft)', 'Lean D': 'var(--d-wash)', 'Toss-up': 'var(--toss)',
+  'Lean R': 'var(--r-wash)', 'Likely R': 'var(--r-soft)', 'Solid R': 'var(--r-soft)',
+};
+function renderMapView() {
+  const byState = {};
+  for (const r of doc.races) if (r.chamber === mapChamber) (byState[r.state] ||= []).push(r);
+  const fills = {};
+  for (const [state, list] of Object.entries(byState)) {
+    const tone = r => {
+      const s = standing(r);
+      if (s.kind === 'won') return s.party === 'D' ? 'var(--d)' : s.party === 'R' ? 'var(--r)' : 'var(--i)';
+      if (s.kind === 'leading') return s.party === 'D' ? 'var(--d-soft)' : s.party === 'R' ? 'var(--r-soft)' : 'var(--i)';
+      return FAVOURED[r.cook?.rating] || 'var(--rule)';
+    };
+    const count = {};
+    for (const r of list) { const c = tone(r); count[c] = (count[c] || 0) + 1; }
+    const order = ['var(--d)', 'var(--d-soft)', 'var(--d-wash)', 'var(--toss)', 'var(--rule)', 'var(--r-wash)', 'var(--r-soft)', 'var(--r)', 'var(--i)'];
+    const parts = order.filter(c => count[c]).map(c => ({ color: c, share: count[c] / list.length }));
+    const top = parts.slice().sort((a, b) => b.share - a.share)[0].color;
+    const lines = list.length === 1
+      ? `${raceName(list[0])}: ${list[0].cook?.rating || 'Not rated'}${list[0].call ? `, called for ${list[0].call.name}` : ''}`
+      : `${state}: ${plural(list.length, 'race')}, ${list.filter(r => r.status === 'called').length} called`;
+    fills[state] = { parts, ink: top === 'var(--d)' || top === 'var(--r)' ? '#fff' : 'var(--ink)', label: esc(lines) };
+  }
+  renderMap($('map'), fills, filters.state, code => {
+    filters.state = filters.state === code ? '' : code;
+    filters.chamber = filters.state ? filters.chamber : '';
+    if (filters.state) filters.rating = '';
+    syncForm(); shown = PAGE; renderTable(); renderMapView();
+  });
+  const items = [['var(--d)', 'Won D'], ['var(--d-soft)', 'Ahead or favoured D'], ['var(--d-wash)', 'Lean D'], ['var(--toss)', 'Toss-up'], ['var(--r-wash)', 'Lean R'], ['var(--r-soft)', 'Ahead or favoured R'], ['var(--r)', 'Won R']];
+  $('map-key').innerHTML = items.map(([c, t]) => `<span><i style="background:${c}"></i>${t}</span>`).join('');
+}
+
+/* Table */
+function matches(r) {
+  if (filters.chamber && r.chamber !== filters.chamber) return false;
+  if (filters.state && r.state !== filters.state) return false;
+  if (filters.status && r.status !== filters.status) return false;
+  if (filters.rating === 'competitive') {
+    const anyRated = doc.races.some(x => x.cook?.rating && !x.cook.assumed);
+    if (anyRated && !(r.cook?.rating && !/^Solid/.test(r.cook.rating))) return false;
+  } else if (filters.rating === 'none') { if (r.cook?.rating) return false; }
+  else if (filters.rating && r.cook?.rating !== filters.rating) return false;
+  if (filters.q) {
+    const hay = `${raceName(r)} ${r.stateName} ${(r.candidates || []).map(c => c.name).join(' ')}`.toLowerCase();
+    if (!hay.includes(filters.q.toLowerCase())) return false;
+  }
+  return true;
+}
+
+const SORTS = {
+  default: (a, b) => (b.status === 'counting') - (a.status === 'counting') || RATING_ORDER.indexOf(a.cook?.rating) - RATING_ORDER.indexOf(b.cook?.rating) || a.id.localeCompare(b.id),
+  race: (a, b) => a.id.localeCompare(b.id, 'en', { numeric: true }),
+  reporting: (a, b) => (b.reporting ?? -1) - (a.reporting ?? -1),
+  margin: (a, b) => Math.abs(margin(a) ?? 999) - Math.abs(margin(b) ?? 999),
+  swing: (a, b) => Math.abs(swing(b) ?? -1) - Math.abs(swing(a) ?? -1),
+};
+
+function statusCell(r) {
+  if (r.status === 'called' && r.call) return `<span class="state-called">Called</span><span class="sub">${esc(r.call.by)}${r.firstCalledAt ? `, ${timeET(r.firstCalledAt)}` : ''}</span>`;
+  if (r.status === 'runoff') return 'Runoff';
+  if (r.status === 'counting') return `Counting${r.callConflict ? '<span class="sub">Sources disagree</span>' : ''}`;
+  return r.carried ? 'No data' : 'No votes yet';
+}
+
+function detailRow(r) {
+  const cands = (r.candidates || []).map(c => `<li class="cand">${pty(c.party)} ${esc(c.name)}${c.incumbent ? ' (incumbent)' : ''}
+    ${c.votes ? `: ${c.votes.toLocaleString('en-US')} votes, ${c.pct}%` : ''}${c.winner ? ' · winner' : ''}</li>`).join('');
+  const b = r.baseline;
+  return `<tr class="detail"><td colspan="6"><ul>${cands}</ul><dl>
+    <dt>Results</dt><dd>${r.source ? link(r.sourceUrl, r.source === 'manual' ? 'Manual entry' : r.source.toUpperCase()) : 'None yet'}${r.updatedAt ? `, ${dayTimeET(r.updatedAt)}` : ''}${r.carried ? ' (last known)' : ''}</dd>
+    ${r.override?.note ? `<dt>Note</dt><dd>${esc(r.override.note)}</dd>` : ''}
+    <dt>Rating</dt><dd>${esc(r.cook?.rating || 'Not rated')}. ${esc(r.cook?.source || 'None entered')}${r.cook?.updatedAt ? `, ${dayTimeET(r.cook.updatedAt)}` : ''}</dd>
+    <dt>Baseline</dt><dd>${b?.margin != null ? `${signed(b.margin)}, ${link(b.source, b.label)}` : 'No two-party baseline for this seat'}${b?.pres24 != null ? `. 2024 president: ${signed(Math.round(b.pres24 * 10) / 10)}` : ''}</dd>
+    <dt>Polls close</dt><dd>${(doc.closings.states[r.state]?.closes || []).map(c => `${timeET(c.at)} (${esc(c.area)})`).join('; ')}</dd>
+    ${r.redrawn ? '<dt>Map</dt><dd>New district lines since 2024</dd>' : ''}
+    ${r.runoffPrimary ? '<dt>Format</dt><dd>All-party primary on Nov 3. Without a majority winner, this goes to a Dec 12 runoff.</dd>' : ''}
+  </dl></td></tr>`;
+}
+
+function renderTable() {
+  const list = doc.races.filter(matches).sort(SORTS[sortKey]);
+  $('count').textContent = `${plural(list.length, 'race')}${filters.rating === 'competitive' ? ', competitive ratings only' : ''}`;
+  const head = [['race', 'Race'], [null, 'Cook'], [null, 'Leader'], ['margin', 'Margin'], ['reporting', 'In'], [null, 'Status']];
+  const cls = ['', '', '', 'n', 'n hide-sm', 'hide-sm'];
+  const th = head.map(([k, t], i) => `<th scope="col" class="${cls[i]}"${k && sortKey === k ? ' aria-sort="ascending"' : ''}>${k ? `<button data-sort="${k}">${t}</button>` : t}</th>`).join('');
+  const rows = list.slice(0, shown).map(r => {
+    const top = r.status === 'called' && r.call ? r.call : leader(r);
+    const m = margin(r);
+    return `<tr class="row" data-id="${esc(r.id)}" tabindex="0" aria-expanded="${openRow === r.id}">
+      <td><span class="race-name">${esc(raceName(r))}</span></td>
+      <td>${ratingChip(r.cook)}</td>
+      <td>${top ? `<span class="cand">${pty(top.party)} ${esc(top.name)}</span>` : '<span class="sub">–</span>'}</td>
+      <td class="n">${signed(m)}</td>
+      <td class="n hide-sm">${r.reporting != null && r.votes ? `${r.reporting}%` : '–'}</td>
+      <td class="hide-sm">${statusCell(r)}</td></tr>${openRow === r.id ? detailRow(r) : ''}`;
+  }).join('');
+  $('table').innerHTML = `<thead><tr>${th}</tr></thead><tbody>${rows || `<tr><td colspan="6">No races match these filters.</td></tr>`}</tbody>`;
+  $('more').hidden = list.length <= shown;
+}
+
+function syncForm() {
+  const f = $('filters');
+  for (const k of Object.keys(filters)) f.elements[k].value = filters[k];
+}
+
+/* Upsets */
+const ringPath = 'M6 13C10 4 34 1 58 2S99 8 97 15 74 25 48 25 3 22 4 13C5 8 12 5 20 4';
+function renderUpsets() {
+  const list = doc.races.filter(isUpset).sort((a, b) => (b.firstCalledAt || '').localeCompare(a.firstCalledAt || ''));
+  $('upset-list').innerHTML = list.length ? list.map(r => `<div class="upset">
+      <span class="ring"><svg viewBox="0 0 100 28" preserveAspectRatio="none" aria-hidden="true"><path d="${ringPath}"/></svg>${esc(raceName(r))}</span>
+      <p>${esc(r.call.name)} (${esc(r.call.party)}) won a seat Cook rated ${esc(r.cook.rating)}. ${signed(margin(r))}, called by ${esc(r.call.by)}.</p></div>`).join('')
+    : `<p class="empty">No upsets yet. A race lands here when the winner differs from Cook's lean.</p>`;
+  const toss = doc.races.filter(isTossup).sort((a, b) => Math.abs(margin(a) ?? 999) - Math.abs(margin(b) ?? 999));
+  $('tossups').innerHTML = toss.length ? toss.map(r => {
+    const s = standing(r);
+    return `<div class="toss"><span>${esc(raceName(r))}</span><span>${s.kind === 'won' ? `${pty(s.party)} won` : r.votes ? signed(margin(r)) : 'Waiting'}</span></div>`;
+  }).join('') : `<p class="empty">Toss-ups appear here once Cook ratings are entered.</p>`;
+}
+
+/* Timeline */
+function renderTimeline() {
+  const groups = pollGroups(doc.races, doc.closings);
+  const bells = new Set(bellwethers(groups).map(r => r.id));
+  const now = doc.sample ? Date.parse(doc.generatedAt) : Date.now();
+  let placedNow = false;
+  const parts = [];
+  for (const g of groups) {
+    const t = Date.parse(g.at);
+    if (!placedNow && t > now && now > Date.parse(groups[0].at)) {
+      parts.push(`<div class="now-line"><span>Now, ${timeET(new Date(now).toISOString())}</span></div>`);
+      placedNow = true;
+    }
+    const names = g.states.map(s => {
+      const later = s.closes.length > 1 ? ` <span class="split">(last ${timeET(s.last)})</span>` : '';
+      return `<span title="${esc(s.closes.map(c => `${timeET(c.at)}: ${c.area}`).join('; '))}">${esc(s.state)}${later}</span>`;
+    }).join('');
+    const watch = g.states.flatMap(s => s.races);
+    const list = watch.map(r => {
+      const s = standing(r);
+      const st = s.kind === 'won' ? ` · ${s.party} won` : r.votes ? ` · ${signed(margin(r))}` : '';
+      return `<li class="${bells.has(r.id) ? 'bell' : ''}">${esc(raceName(r))} <span class="sub" style="display:inline">${esc(r.cook.rating)}${st}</span></li>`;
+    }).join('');
+    const allCalled = g.states.flatMap(s => s.all).filter(r => r.status === 'called').length;
+    const all = g.states.flatMap(s => s.all).length;
+    parts.push(`<div class="wave${t <= now ? ' past' : ''}"><p class="wave-time">${timeET(g.at)}<small>${allCalled} of ${plural(all, 'race')} called</small></p>
+      <div class="states-row">${names}</div>${list ? `<ul class="watch">${list}</ul>` : ''}</div>`);
+  }
+  $('timeline').innerHTML = parts.join('');
+}
+
+/* Path */
+function renderPath() {
+  const line = (b, p) => {
+    const q = path(b, p);
+    const name = p === 'D' ? 'Democrats' : 'Republicans';
+    const text = q.state === 'clinched' ? `${name} have the majority`
+      : q.state === 'out' ? `${name} can no longer reach ${b.toWin[p]}`
+      : `${name} need ${q.need} of ${q.of} uncalled`;
+    const note = q.state === 'alive' ? `${q.share}% of what is left, ${b.leading[p]} currently ahead` : `${b.won[p]} seats secured`;
+    return `<div class="path-line">${pty(p)}<div><strong>${text}</strong><span class="t">${note}</span></div></div>`;
+  };
+  $('path-grid').innerHTML = ['house', 'senate'].map(k => {
+    const b = balance(doc.races, k, doc.chambers[k]);
+    return `<div class="path-item"><h3>${k === 'house' ? 'House' : 'Senate'}</h3>${line(b, 'D')}${line(b, 'R')}${k === 'senate' ? `<p class="cook-note">${esc(doc.chambers.senate.note)}</p>` : ''}</div>`;
+  }).join('');
+}
+
+/* Swing */
+function renderSwing() {
+  const a = averageSwing(doc.races);
+  const cell = (x, t) => `<div><b>${x.avg == null ? '–' : signed(x.avg).replace('+', ' +')}</b><span>${t}, ${x.n ? `from ${plural(x.n, 'called race')}` : 'none called yet'}</span></div>`;
+  $('swing-avg').innerHTML = cell(a.house, 'House, same lines as 2024') + cell(a.senate, 'Senate, last election') + cell(a.governor, 'Governors, last election');
+  const rows = doc.races.filter(r => swing(r) != null && r.reporting >= 50 && (r.chamber !== 'house' || !isSolidNoise(r)))
+    .sort((x, y) => Math.abs(swing(y)) - Math.abs(swing(x))).slice(0, 20);
+  const LIMIT = 40;
+  const pos = m => 50 + (Math.max(-LIMIT, Math.min(LIMIT, m)) / LIMIT) * 50;
+  $('swing-chart').innerHTML = rows.length ? rows.map(r => {
+    const now = margin(r), then = r.baseline.margin;
+    const [l, h] = [pos(then), pos(now)].sort((x, y) => x - y);
+    return `<div class="swing-row"><span>${esc(raceName(r))}<span class="sub">${esc(r.baseline.label)}</span></span>
+      <div class="dumb" title="${esc(r.baseline.label)} ${signed(then)}, now ${signed(now)}"><span class="axis"></span><span class="bar" style="left:${l}%;width:${h - l}%"></span>
+      <span class="then" style="left:${pos(then)}%"></span><span class="now" style="left:${pos(now)}%;background:var(--${now >= 0 ? 'd' : 'r'})"></span></div>
+      <span class="n" style="text-align:right">${signed(swing(r))}</span></div>`;
+  }).join('') + `<p class="cook-note">The largest swings with at least half the vote in. Open circle is the baseline, filled is now, centre is even. Scale stops at 40 points either side.</p>`
+    : `<p class="empty">Swing appears once races have at least half their vote in.</p>`;
+}
+const isSolidNoise = r => !r.baseline?.likeForLike;
+
+/* Footer */
+function renderSources() {
+  $('sources').innerHTML = (doc.sources || []).map(s => `<div class="source"><span class="dot${s.ok ? '' : ' bad'}"></span>
+    <span>${esc(s.name)}: ${s.ok ? plural(s.races, 'race') : 'not available'}, checked ${dayTimeET(s.checkedAt)}${s.role === 'backstop' ? ' (backstop)' : ''}</span></div>`).join('')
+    + `<p>${link(doc.chambers.sourceUrl, doc.chambers.source)} for seat totals. Swing baselines are named on each race.</p>`;
+  $('closing-sources').innerHTML = Object.values(doc.closings.states).map(s =>
+    `<p>${link(s.sourceUrl, s.state)}: ${esc(s.localHours)}, ${timeET(s.first)}${s.last !== s.first ? ` to ${timeET(s.last)}` : ''}${s.note ? `. ${esc(s.note)}` : ''}</p>`).join('');
+}
+
+function checkNewCalls() {
+  const ids = new Set(doc.races.filter(r => r.status === 'called').map(r => r.id));
+  if (knownCalls) {
+    const fresh = doc.races.filter(r => ids.has(r.id) && !knownCalls.has(r.id));
+    for (const k of ['house', 'senate']) if (fresh.some(r => r.chamber === k)) meadows[k]?.ripple();
+  }
+  knownCalls = ids;
+}
+
+function renderAll() {
+  renderStatus();
+  if (!doc) return;
+  renderBalance(); renderMapView(); renderTable(); renderUpsets(); renderTimeline(); renderPath(); renderSwing(); renderSources();
+  checkNewCalls();
+}
+
+async function load() {
+  try {
+    const res = await fetch(`${DATA}?t=${Math.floor(Date.now() / 60000)}`, { cache: 'no-store' });
+    if (!res.ok) throw new Error(res.status);
+    const next = await res.json();
+    if (doc?.generatedAt === next.generatedAt) { loadError = null; renderStatus(); return; }
+    doc = next; lastGood = next; loadError = null;
+    renderAll();
+  } catch {
+    loadError = true;
+    if (!doc && lastGood) doc = lastGood;
+    renderStatus();
+    if (!doc) $('updated').textContent = 'Results could not be loaded. Retrying each minute.';
+  }
+}
+
+function initControls() {
+  const f = $('filters');
+  f.elements.rating.innerHTML = `<option value="competitive">Competitive</option><option value="">All</option>`
+    + RATING_ORDER.map(r => `<option>${r}</option>`).join('') + `<option value="none">Not rated</option>`;
+  f.addEventListener('input', e => {
+    filters[e.target.name] = e.target.value;
+    shown = PAGE; renderTable(); if (e.target.name === 'state') renderMapView();
+  });
+  f.addEventListener('submit', e => e.preventDefault());
+  $('map-chamber').addEventListener('click', e => {
+    const b = e.target.closest('button'); if (!b) return;
+    mapChamber = b.dataset.v;
+    [...$('map-chamber').children].forEach(x => x.setAttribute('aria-pressed', x === b));
+    renderMapView();
+  });
+  $('more').addEventListener('click', () => { shown += PAGE; renderTable(); });
+  const toggle = tr => { openRow = openRow === tr.dataset.id ? null : tr.dataset.id; renderTable(); };
+  $('table').addEventListener('click', e => {
+    const s = e.target.closest('button[data-sort]');
+    if (s) { sortKey = sortKey === s.dataset.sort ? 'default' : s.dataset.sort; renderTable(); return; }
+    const tr = e.target.closest('tr.row');
+    if (tr && !e.target.closest('a')) toggle(tr);
+  });
+  $('table').addEventListener('keydown', e => {
+    const tr = e.target.closest('tr.row');
+    if (tr && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); toggle(tr); }
+  });
+  $('latest').addEventListener('click', e => {
+    const a = e.target.closest('[data-race]'); if (!a) return;
+    const r = doc.races.find(x => x.id === a.dataset.race);
+    filters = { chamber: '', state: r.state, rating: '', status: '', q: '' };
+    openRow = r.id; syncForm(); renderTable(); renderMapView();
+  });
+}
+
+function initStates() {
+  const sel = $('filters').elements.state;
+  const seen = new Map(doc.races.map(r => [r.state, r.stateName]));
+  sel.innerHTML = `<option value="">All</option>` + [...seen].sort((a, b) => String(a[1]).localeCompare(String(b[1])))
+    .map(([s, n]) => `<option value="${esc(s)}">${esc(n || s)}</option>`).join('');
+}
+
+initControls();
+await load();
+if (doc) initStates();
+setInterval(load, REFRESH_MS);
+setInterval(() => { renderStatus(); }, 30000);

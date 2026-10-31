@@ -1,0 +1,5 @@
+{
+  "GA-S": { "margin": 1.22, "kind": "senate-2021-runoff", "label": "2021 Senate runoff", "source": "https://en.wikipedia.org/wiki/2020%E2%80%9321_United_States_Senate_election_in_Georgia" },
+  "NE-S": { "margin": -25.16, "kind": "senate-2024-special", "label": "2024 Senate special", "source": "https://en.wikipedia.org/wiki/2024_United_States_Senate_special_election_in_Nebraska" },
+  "OK-S": { "margin": -26.53, "kind": "senate-2022-special", "label": "2022 Senate special", "source": "https://en.wikipedia.org/wiki/2022_United_States_Senate_special_election_in_Oklahoma" }
+}
