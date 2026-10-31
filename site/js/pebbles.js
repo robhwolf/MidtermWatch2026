@@ -8,12 +8,12 @@ export const TILES = {
   OR: [1, 3], NV: [2, 3], WY: [3, 3], SD: [4, 3], IA: [5, 3], IL: [6, 3], IN: [7, 3], OH: [8, 3], PA: [9, 3], NJ: [10, 3], CT: [11, 3],
   CA: [1, 4], UT: [2, 4], CO: [3, 4], NE: [4, 4], MO: [5, 4], KY: [6, 4], WV: [7, 4], VA: [8, 4], MD: [9, 4], DE: [10, 4],
   AZ: [2, 5], NM: [3, 5], KS: [4, 5], AR: [5, 5], TN: [6, 5], NC: [7, 5], SC: [8, 5], DC: [9, 5],
-  AK: [0, 6], OK: [4, 6], LA: [5, 6], MS: [6, 6], AL: [7, 6], GA: [8, 6],
-  HI: [1, 7], TX: [4, 7], FL: [9, 7],
+  AK: [1, 6], OK: [4, 6], LA: [5, 6], MS: [6, 6], AL: [7, 6], GA: [8, 6],
+  HI: [2, 7], TX: [4, 7], FL: [9, 7],
 };
 
 const CELL = 54;
-const R = 24;
+const R = 25.5;
 
 function shape(code, cx, cy) {
   let s = code.charCodeAt(0) * 31 + code.charCodeAt(1);
@@ -37,7 +37,7 @@ function shape(code, cx, cy) {
 // fills: { TX: { parts:[{color,share}], ink, label } }; a state with no race
 // this year has no entry.
 export function renderMap(el, fills, selected, onPick) {
-  const w = 12 * CELL, h = 8 * CELL;
+  const w = 11 * CELL, h = 8 * CELL;
   const body = Object.entries(TILES).map(([code, [cx, cy]]) => {
     const x = cx * CELL + CELL / 2, y = cy * CELL + CELL / 2;
     const d = shape(code, x, y);
@@ -60,7 +60,7 @@ export function renderMap(el, fills, selected, onPick) {
       <text x="${x}" y="${y}" fill="${f ? f.ink : 'var(--ink-3)'}">${code}</text>
       <title>${f ? f.label : `${code}: no race this year`}</title></g>`;
   }).join('');
-  el.innerHTML = `<svg viewBox="0 0 ${w} ${h}" role="group" aria-label="State map; choose a state to filter the table">${body}</svg>`;
+  el.innerHTML = `<svg viewBox="${CELL} 0 ${w} ${h}" role="group" aria-label="State map; choose a state to filter the table">${body}</svg>`;
   const pick = g => onPick(g.dataset.s);
   el.querySelectorAll('.pebble').forEach(g => {
     g.addEventListener('click', () => pick(g));

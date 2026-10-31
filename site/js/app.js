@@ -76,11 +76,11 @@ function renderBalance() {
     const cfg = doc.chambers[key];
     const b = balance(doc.races, key, cfg);
     const el = $(`c-${key}`);
-    const goal = key === 'senate' ? `<strong>D 51 · R 50</strong><span>to control the Senate</span>` : `<strong>218</strong><span>to win the House</span>`;
+    const goal = key === 'senate' ? `<strong>51 to win</strong><span>Republicans need 50, with the VP's tie-break</span>` : `<strong>218 to win</strong>`;
     el.querySelector('.head-slot').innerHTML = `<div class="chamber-head">
-      <div class="tally D"><b>${b.won.D}</b><small>Dem<br>${b.leading.D ? `+${b.leading.D} ahead` : ''}</small></div>
+      <div class="tally D"><b>${b.won.D}</b><small>Dem<br>${b.leading.D ? `+${b.leading.D} leading` : ''}</small></div>
       <div class="goal"><h2>${label}</h2>${goal}</div>
-      <div class="tally R right"><small>Rep<br>${b.leading.R ? `+${b.leading.R} ahead` : ''}</small><b>${b.won.R}</b></div></div>`;
+      <div class="tally R right"><small>Rep<br>${b.leading.R ? `+${b.leading.R} leading` : ''}</small><b>${b.won.R}</b></div></div>`;
     const cv = el.querySelector('canvas');
     cv.setAttribute('aria-label', `${label}: Democrats ${b.won.D} won, ${b.leading.D} leading. Republicans ${b.won.R} won, ${b.leading.R} leading. ${b.uncalled} uncalled.`);
     meadows[key].set(b);
@@ -92,8 +92,8 @@ function renderBalance() {
   }
   const g = governors(doc.races);
   $('governors').innerHTML = `<h2>Governors</h2>
-    <span class="D"><b>${g.won.D}</b> Dem${g.leading.D ? `, +${g.leading.D} ahead` : ''}</span>
-    <span class="R"><b>${g.won.R}</b> Rep${g.leading.R ? `, +${g.leading.R} ahead` : ''}</span>
+    <span class="D"><b>${g.won.D}</b> Dem${g.leading.D ? `, +${g.leading.D} leading` : ''}</span>
+    <span class="R"><b>${g.won.R}</b> Rep${g.leading.R ? `, +${g.leading.R} leading` : ''}</span>
     ${g.won.I ? `<span><b>${g.won.I}</b> Ind</span>` : ''}
     <span>${g.uncalled} of ${g.total} races uncalled</span>`;
 
@@ -149,7 +149,7 @@ function renderMapView() {
     if (filters.state) filters.rating = '';
     syncForm(); shown = PAGE; renderTable(); renderMapView();
   });
-  const items = [['var(--d)', 'Won D'], ['var(--d-soft)', 'Ahead or favoured D'], ['var(--d-wash)', 'Lean D'], ['var(--toss)', 'Toss-up'], ['var(--r-wash)', 'Lean R'], ['var(--r-soft)', 'Ahead or favoured R'], ['var(--r)', 'Won R']];
+  const items = [['var(--d)', 'Won D'], ['var(--d-soft)', 'Ahead or favoured D'], ['var(--d-wash)', 'Lean D'], ['var(--toss)', 'Toss-up'], ['var(--r-wash)', 'Lean R'], ['var(--r-soft)', 'Ahead or favoured R'], ['var(--r)', 'Won R'], ['var(--raised)', 'No race this year']];
   $('map-key').innerHTML = items.map(([c, t]) => `<span><i style="background:${c}"></i>${t}</span>`).join('');
 }
 
@@ -185,11 +185,17 @@ function statusCell(r) {
   return r.carried ? 'No data' : 'No votes yet';
 }
 
+const columns = () => (matchMedia('(max-width: 640px)').matches ? 4 : 6);
+const shortName = n => {
+  const parts = String(n).split(' ');
+  return parts.length > 1 ? `<span class="fn">${esc(parts.slice(0, -1).join(' '))} </span>${esc(parts.at(-1))}` : esc(n);
+};
+
 function detailRow(r) {
   const cands = (r.candidates || []).map(c => `<li class="cand">${pty(c.party)} ${esc(c.name)}${c.incumbent ? ' (incumbent)' : ''}
     ${c.votes ? `: ${c.votes.toLocaleString('en-US')} votes, ${c.pct}%` : ''}${c.winner ? ' · winner' : ''}</li>`).join('');
   const b = r.baseline;
-  return `<tr class="detail"><td colspan="6"><ul>${cands}</ul><dl>
+  return `<tr class="detail"><td colspan="${columns()}"><ul>${cands}</ul><dl>
     <dt>Results</dt><dd>${r.source ? link(r.sourceUrl, r.source === 'manual' ? 'Manual entry' : r.source.toUpperCase()) : 'None yet'}${r.updatedAt ? `, ${dayTimeET(r.updatedAt)}` : ''}${r.carried ? ' (last known)' : ''}</dd>
     ${r.override?.note ? `<dt>Note</dt><dd>${esc(r.override.note)}</dd>` : ''}
     <dt>Rating</dt><dd>${esc(r.cook?.rating || 'Not rated')}. ${esc(r.cook?.source || 'None entered')}${r.cook?.updatedAt ? `, ${dayTimeET(r.cook.updatedAt)}` : ''}</dd>
@@ -212,12 +218,12 @@ function renderTable() {
     return `<tr class="row" data-id="${esc(r.id)}" tabindex="0" aria-expanded="${openRow === r.id}">
       <td><span class="race-name">${esc(raceName(r))}</span></td>
       <td>${ratingChip(r.cook)}</td>
-      <td>${top ? `<span class="cand">${pty(top.party)} ${esc(top.name)}</span>` : '<span class="sub">–</span>'}</td>
+      <td>${top ? `<span class="cand">${pty(top.party)} <span>${shortName(top.name)}</span></span>` : '<span class="sub">–</span>'}</td>
       <td class="n">${signed(m)}</td>
       <td class="n hide-sm">${r.reporting != null && r.votes ? `${r.reporting}%` : '–'}</td>
       <td class="hide-sm">${statusCell(r)}</td></tr>${openRow === r.id ? detailRow(r) : ''}`;
   }).join('');
-  $('table').innerHTML = `<thead><tr>${th}</tr></thead><tbody>${rows || `<tr><td colspan="6">No races match these filters.</td></tr>`}</tbody>`;
+  $('table').innerHTML = `<thead><tr>${th}</tr></thead><tbody>${rows || `<tr><td colspan="${columns()}">No races match these filters.</td></tr>`}</tbody>`;
   $('more').hidden = list.length <= shown;
 }
 
@@ -232,7 +238,7 @@ function renderUpsets() {
   const list = doc.races.filter(isUpset).sort((a, b) => (b.firstCalledAt || '').localeCompare(a.firstCalledAt || ''));
   $('upset-list').innerHTML = list.length ? list.map(r => `<div class="upset">
       <span class="ring"><svg viewBox="0 0 100 28" preserveAspectRatio="none" aria-hidden="true"><path d="${ringPath}"/></svg>${esc(raceName(r))}</span>
-      <p>${esc(r.call.name)} (${esc(r.call.party)}) won a seat Cook rated ${esc(r.cook.rating)}. ${signed(margin(r))}, called by ${esc(r.call.by)}.</p></div>`).join('')
+      <p>Cook rated this ${esc(r.cook.rating)}. ${esc(r.call.name)} (${esc(r.call.party)}) won${margin(r) != null ? ` by ${Math.abs(margin(r)).toFixed(1)} points` : ''}. Called by ${esc(r.call.by)}.</p></div>`).join('')
     : `<p class="empty">No upsets yet. A race lands here when the winner differs from Cook's lean.</p>`;
   const toss = doc.races.filter(isTossup).sort((a, b) => Math.abs(margin(a) ?? 999) - Math.abs(margin(b) ?? 999));
   $('tossups').innerHTML = toss.length ? toss.map(r => {
@@ -270,6 +276,12 @@ function renderTimeline() {
       <div class="states-row">${names}</div>${list ? `<ul class="watch">${list}</ul>` : ''}</div>`);
   }
   $('timeline').innerHTML = parts.join('');
+  const first = bellwethers(groups);
+  $('bells').innerHTML = first.length ? first.map(r => {
+    const s = standing(r);
+    const st = s.kind === 'won' ? `${s.party} won` : r.votes ? signed(margin(r)) : 'Waiting';
+    return `<li class="bell">${esc(raceName(r))} <span class="sub" style="display:inline">${esc(r.cook.rating)}, ${timeET(doc.closings.states[r.state].first)} · ${st}</span></li>`;
+  }).join('') : '<li class="plain">Bellwethers appear once Cook ratings are entered.</li>';
 }
 
 /* Path */
@@ -296,16 +308,18 @@ function renderSwing() {
   $('swing-avg').innerHTML = cell(a.house, 'House, same lines as 2024') + cell(a.senate, 'Senate, last election') + cell(a.governor, 'Governors, last election');
   const rows = doc.races.filter(r => swing(r) != null && r.reporting >= 50 && (r.chamber !== 'house' || !isSolidNoise(r)))
     .sort((x, y) => Math.abs(swing(y)) - Math.abs(swing(x))).slice(0, 20);
-  const LIMIT = 40;
+  const LIMIT = 60;
   const pos = m => 50 + (Math.max(-LIMIT, Math.min(LIMIT, m)) / LIMIT) * 50;
-  $('swing-chart').innerHTML = rows.length ? rows.map(r => {
+  $('swing-chart').innerHTML = rows.length ? `<div class="swing-row swing-head"><span></span>
+      <div class="swing-axis"><span>Republican</span><span>Even</span><span>Democratic</span></div><span></span></div>
+      <p class="swing-key"><i class="then"></i>Last election <i class="now"></i>Now</p>` + rows.map(r => {
     const now = margin(r), then = r.baseline.margin;
     const [l, h] = [pos(then), pos(now)].sort((x, y) => x - y);
     return `<div class="swing-row"><span>${esc(raceName(r))}<span class="sub">${esc(r.baseline.label)}</span></span>
       <div class="dumb" title="${esc(r.baseline.label)} ${signed(then)}, now ${signed(now)}"><span class="axis"></span><span class="bar" style="left:${l}%;width:${h - l}%"></span>
       <span class="then" style="left:${pos(then)}%"></span><span class="now" style="left:${pos(now)}%;background:var(--${now >= 0 ? 'd' : 'r'})"></span></div>
       <span class="n" style="text-align:right">${signed(swing(r))}</span></div>`;
-  }).join('') + `<p class="cook-note">The largest swings with at least half the vote in. Open circle is the baseline, filled is now, centre is even. Scale stops at 40 points either side.</p>`
+  }).join('') + `<p class="cook-note">The largest swings with at least half the vote in. Each row names its baseline. Margins past 60 points sit at the edge.</p>`
     : `<p class="empty">Swing appears once races have at least half their vote in.</p>`;
 }
 const isSolidNoise = r => !r.baseline?.likeForLike;
