@@ -29,6 +29,7 @@ on:
       - 'scripts/**'
       - '.github/workflows/**'
 
+  # Run by hand from the Actions tab if a scheduled run looks stuck.
   workflow_dispatch:
 
 permissions:
