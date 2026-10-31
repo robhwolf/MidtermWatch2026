@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { test } from 'node:test';
 import { parseCnn, parseNpr, parseNyt } from '../scripts/lib/feeds.mjs';
+import { midPrices } from '../scripts/lib/markets.mjs';
 import { applyOverride, mergeRace } from '../scripts/lib/merge.mjs';
 import { csvRows, parseRatings, resolveRating } from '../scripts/lib/ratings.mjs';
 import { averageSwing, balance, isStale, isUpset, margin, path, staleLimitMinutes, timeET } from '../site/js/model.js';
@@ -99,6 +100,24 @@ test('manual override can call, retract and correct', () => {
   const fixed = applyOverride(base, { candidates: [{ name: 'A', party: 'D', votes: 30 }, { name: 'B', party: 'R', votes: 70 }] }, NIGHT);
   assert.equal(fixed.candidates[0].name, 'B');
   assert.equal(fixed.candidates[0].pct, 70);
+});
+
+test('a manual call keeps its first time across runs', () => {
+  const later = '2026-11-04T03:00:00.000Z';
+  const first = applyOverride(mergeRace('NC-S', [rec()], null, NIGHT), { call: { party: 'R', name: 'B' } }, NIGHT);
+  const next = applyOverride(mergeRace('NC-S', [rec()], first, later), { call: { party: 'R', name: 'B' } }, later, first);
+  assert.equal(next.firstCalledAt, NIGHT);
+  assert.equal(next.updatedAt, NIGHT);
+});
+
+test('market midpoints, with last price as the fallback', () => {
+  const p = midPrices([
+    { ticker: 'E-D', yes_bid_dollars: '0.70', yes_ask_dollars: '0.72' },
+    { ticker: 'E-R', yes_bid_dollars: '0', yes_ask_dollars: '0', last_price_dollars: '0.29' },
+    { ticker: 'E-X', last_price_dollars: '0.01' },
+  ], 'E');
+  assert.deepEqual(p, { D: 71, R: 29 });
+  assert.equal(midPrices([{ ticker: 'E-D', last_price_dollars: '0.5' }], 'E'), null);
 });
 
 test('ratings CSV forgives spelling and reports the rest', () => {

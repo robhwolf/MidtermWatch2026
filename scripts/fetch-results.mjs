@@ -9,11 +9,13 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { CNN_BASE, NPR_BASE, NYT_BASE, cnnKey, fetchJson, parseCnn, parseNpr, parseNyt } from './lib/feeds.mjs';
 import { applyOverride, mergeRace } from './lib/merge.mjs';
+import { updateMarkets } from './lib/markets.mjs';
 import { parseRatings, resolveRating } from './lib/ratings.mjs';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const SRC = join(ROOT, 'data', 'source');
 const OUT = join(ROOT, 'site', 'data', 'results.json');
+const MARKETS = join(ROOT, 'site', 'data', 'markets.json');
 const read = f => JSON.parse(readFileSync(join(SRC, f), 'utf8'));
 
 const COOK_SOURCE = 'Cook Political Report, entered by hand';
@@ -103,7 +105,7 @@ async function main() {
       candidates: meta.candidates.map(c => ({ ...c, votes: 0, pct: null, winner: false })),
       call: null, source: null, sourceUrl: null, updatedAt: null, checkedAt: now, carried: true,
     };
-    const raced = applyOverride(base, overrides[meta.id], now);
+    const raced = applyOverride(base, overrides[meta.id], now, prev[meta.id]);
     const { candidates: _drop, ...info } = meta;
     const r = resolveRating(meta.id, meta, ratings);
     return {
@@ -123,6 +125,9 @@ async function main() {
     races,
   };
   writeFileSync(OUT, JSON.stringify(doc));
+
+  const market = await updateMarkets(MARKETS, now);
+  console.log(`kalshi: ${market.ok ? 'ok' : `skipped, ${market.error}`}`);
 
   const called = races.filter(r => r.status === 'called').length;
   const carried = races.filter(r => r.carried).length;

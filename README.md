@@ -72,6 +72,7 @@ Actions shows each run. To force one, use **Actions > Refresh results > Run work
 | Backstop | CNN, one request per race, only for races both feeds miss, capped at 150 a run | Scheduled |
 | Calls | AP through NYT and NPR, CNN if used, or you | Scheduled |
 | Poll closing | Each state's election office; source URLs are in `scripts/lib/closings-data.mjs` and the page footer | Checked 31 Oct |
+| Market odds | Kalshi prices for House and Senate control. Optional: a failed fetch skips one point. | Scheduled |
 | Baseline | NYT archives: 2024 House, 2020 and 2022 Senate, 2022 and 2024 governors. GA, NE and OK Senate are in `data/source/baseline-exceptions.json`. | Once |
 
 These feeds are undocumented and can change. If one fails, the other carries on, the page shows a warning, and races no source returned keep their last known count.

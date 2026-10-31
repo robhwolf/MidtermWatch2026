@@ -64,11 +64,13 @@ export function mergeRace(id, fresh, prev, now, nowMs = Date.parse(now)) {
 // overrides.json: { "NC-S": { "call": { "party":"D", "name":"Roy Cooper" },
 //                             "reporting": 98, "candidates": [...], "note": "..." } }
 // "call": null clears a feed's call, so a bad call can be retracted.
-export function applyOverride(race, ov, now) {
+export function applyOverride(race, ov, now, prev) {
   if (!ov) return race;
   const r = { ...race };
   if ('call' in ov) {
-    r.call = ov.call ? { ...ov.call, at: ov.call.at || ov.at || now, by: ov.by || 'Manual' } : null;
+    // A manual call keeps the time it first appeared, not the time of this run.
+    const firstSeen = prev?.override && prev.firstCalledAt;
+    r.call = ov.call ? { ...ov.call, at: ov.call.at || ov.at || firstSeen || now, by: ov.by || 'Manual' } : null;
     r.status = r.call ? 'called' : r.votes > 0 ? 'counting' : 'pending';
     r.callConflict = false;
     r.firstCalledAt = r.call ? r.call.at : null;
@@ -83,9 +85,9 @@ export function applyOverride(race, ov, now) {
     r.votes = total;
     if (r.status === 'pending' && total > 0) r.status = 'counting';
   }
-  r.override = { note: ov.note || null, at: ov.at || now };
+  r.override = { note: ov.note || null, at: ov.at || prev?.override?.at || now };
   r.source = 'manual';
   r.sourceUrl = 'data/source/overrides.json';
-  r.updatedAt = ov.at || now;
+  r.updatedAt = r.override.at;
   return r;
 }

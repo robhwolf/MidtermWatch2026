@@ -208,6 +208,12 @@ section > h2::after {
 .dumb .then, .dumb .now { position: absolute; top: 4px; width: 10px; height: 10px; margin-left: -5px; border-radius: 50%; }
 .dumb .then { background: var(--ground); box-shadow: inset 0 0 0 2px var(--ink-3); }
 
+.markets { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr)); gap: 20px 36px; }
+.market { margin: 0; }
+.market figcaption { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 4px; }
+.market .read { font-size: .88rem; font-variant-numeric: tabular-nums; }
+.market svg { display: block; width: 100%; height: auto; touch-action: pan-y; }
+.market svg text { font: 11px var(--text); fill: var(--ink-2); }
 .foot { padding-block: 32px 48px; border-top: 1px solid var(--rule); color: var(--ink-2); font-size: .92rem; }
 .foot h2 { font-size: 1.2rem; letter-spacing: 0; color: var(--ink); }
 .source { display: flex; gap: 8px; padding-block: 3px; }

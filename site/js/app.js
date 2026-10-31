@@ -324,6 +324,60 @@ function renderSwing() {
 }
 const isSolidNoise = r => !r.baseline?.likeForLike;
 
+/* Prediction markets */
+function marketChart(points, key, title) {
+  const W = 480, H = 170, L = 34, R = 14, T = 10, B = 24;
+  const t0 = Date.parse(points[0].at), t1 = Date.parse(points.at(-1).at);
+  const x = at => L + ((Date.parse(at) - t0) / Math.max(1, t1 - t0)) * (W - L - R);
+  const y = v => T + (1 - v / 100) * (H - T - B);
+  const line = p => points.map((d, i) => `${i ? 'L' : 'M'}${x(d.at).toFixed(1)} ${y(d[key][p]).toFixed(1)}`).join('');
+  const grid = [0, 50, 100].map(v => `<line x1="${L}" x2="${W - R}" y1="${y(v)}" y2="${y(v)}" stroke="var(--rule)"/>
+    <text x="${L - 6}" y="${y(v)}" text-anchor="end" dominant-baseline="central">${v}%</text>`).join('');
+  const last = points.at(-1)[key];
+  const end = p => `<circle cx="${x(points.at(-1).at)}" cy="${y(last[p])}" r="4" fill="var(--${p.toLowerCase()})" stroke="var(--ground)" stroke-width="2"/>`;
+  return `<figure class="market" data-key="${key}"><figcaption><strong>${title}</strong>
+      <span class="read">${pty('D')} ${last.D}% &nbsp; ${pty('R')} ${last.R}%</span></figcaption>
+    <svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${title}: Democrats ${last.D} percent, Republicans ${last.R} percent">
+      ${grid}
+      <text x="${L}" y="${H - 6}">${timeET(points[0].at)}</text>
+      <text x="${W - R}" y="${H - 6}" text-anchor="end">${timeET(points.at(-1).at)}</text>
+      <path d="${line('D')}" fill="none" stroke="var(--d)" stroke-width="2"/>
+      <path d="${line('R')}" fill="none" stroke="var(--r)" stroke-width="2"/>
+      ${end('D')}${end('R')}
+      <line class="hair" x1="0" x2="0" y1="${T}" y2="${H - B}" stroke="var(--ink-2)" hidden/>
+    </svg></figure>`;
+}
+
+function renderMarkets(m) {
+  const points = m?.points || [];
+  $('markets').hidden = points.length < 2;
+  if (points.length < 2) return;
+  $('market-chart').innerHTML = `<div class="markets">${marketChart(points, 'house', 'House control')}${marketChart(points, 'senate', 'Senate control')}</div>
+    <p class="cook-note">${link(m.sourceUrl, m.source)}, midpoint of the bid and ask. Last updated ${dayTimeET(points.at(-1).at)}.</p>`;
+  document.querySelectorAll('.market').forEach(fig => {
+    const svg = fig.querySelector('svg'), hair = fig.querySelector('.hair'), read = fig.querySelector('.read'), key = fig.dataset.key;
+    const reset = read.innerHTML;
+    svg.addEventListener('pointermove', e => {
+      const box = svg.getBoundingClientRect();
+      const px = ((e.clientX - box.left) / box.width) * 480;
+      const share = Math.min(1, Math.max(0, (px - 34) / (480 - 48)));
+      const target = Date.parse(points[0].at) + share * (Date.parse(points.at(-1).at) - Date.parse(points[0].at));
+      const d = points.reduce((a, b) => (Math.abs(Date.parse(b.at) - target) < Math.abs(Date.parse(a.at) - target) ? b : a));
+      hair.hidden = false; hair.setAttribute('x1', px); hair.setAttribute('x2', px);
+      read.innerHTML = `${timeET(d.at)} &nbsp; ${pty('D')} ${d[key].D}% &nbsp; ${pty('R')} ${d[key].R}%`;
+    });
+    svg.addEventListener('pointerleave', () => { hair.hidden = true; read.innerHTML = reset; });
+  });
+}
+
+async function loadMarkets() {
+  try {
+    const url = sample ? 'data/sample-markets.json' : 'data/markets.json';
+    const res = await fetch(`${url}?t=${Math.floor(Date.now() / 60000)}`, { cache: 'no-store' });
+    if (res.ok) renderMarkets(await res.json());
+  } catch { /* markets are optional */ }
+}
+
 /* Footer */
 function renderSources() {
   $('sources').innerHTML = (doc.sources || []).map(s => `<div class="source"><span class="dot${s.ok ? '' : ' bad'}"></span>
@@ -410,5 +464,7 @@ function initStates() {
 initControls();
 await load();
 if (doc) initStates();
+loadMarkets();
 setInterval(load, REFRESH_MS);
+setInterval(loadMarkets, REFRESH_MS * 5);
 setInterval(() => { renderStatus(); }, 30000);
