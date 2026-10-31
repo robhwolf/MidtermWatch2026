@@ -1,0 +1,100 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-31T00:00:00Z",
+  "title": "Design System: Midterm Watch 2026",
+  "extensions": {
+    "colorMeta": {
+      "ground": { "role": "neutral", "displayName": "Lichen Ground", "canonical": "#f3f5ee", "tonalRamp": ["#141c18", "#1b2822", "#47564d", "#647268", "#cdd4c3", "#d6dccf", "#f3f5ee", "#fbfcf8"] },
+      "ink": { "role": "neutral", "displayName": "Pine Ink", "canonical": "#1b2822", "tonalRamp": ["#0c1210", "#141c18", "#1b2822", "#47564d", "#647268", "#93a297", "#b4c1b6", "#e8eee6"] },
+      "slate-blue": { "role": "primary", "displayName": "Slate Blue", "canonical": "#2f6d9e", "tonalRamp": ["#1f3240", "#24506f", "#2f6d9e", "#5a9bd0", "#8fb3cf", "#b8d0e2", "#dfe9f0", "#eef4f8"] },
+      "brick-red": { "role": "primary", "displayName": "Brick Red", "canonical": "#b8483e", "tonalRamp": ["#3a2522", "#8a4c44", "#b8483e", "#d9705f", "#dda59f", "#e8c3bf", "#f4e2df", "#faf0ee"] },
+      "pencil": { "role": "tertiary", "displayName": "Pencil Orange", "canonical": "#c0772a", "tonalRamp": ["#43361a", "#7a4c14", "#c0772a", "#e5a35a", "#e7a86a", "#f0c79a", "#f5e7c4", "#fbf3e2"] }
+    },
+    "typographyMeta": {
+      "numeral-display": { "displayName": "Numeral Display", "purpose": "Giant chamber counts." },
+      "headline": { "displayName": "Headline", "purpose": "Section headings." },
+      "body": { "displayName": "Body", "purpose": "Running text and table text." }
+    },
+    "shadows": [
+      { "name": "chip-ring", "value": "inset 0 0 0 1px var(--rule)", "purpose": "Border-like ring on watch pills and assumed ratings; not elevation." }
+    ],
+    "motion": [
+      { "name": "smooth-scroll", "value": "scroll-behavior: smooth", "purpose": "Jump links; disabled under prefers-reduced-motion." }
+    ],
+    "breakpoints": [
+      { "name": "sm", "value": "640px" },
+      { "name": "map-split", "value": "900px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Segmented Toggle",
+      "kind": "chip",
+      "refersTo": "segmented-toggle",
+      "description": "Pill switch for map views.",
+      "html": "<div class=\"ds-seg\"><button aria-pressed=\"true\">Rating</button><button aria-pressed=\"false\">Margin</button></div>",
+      "css": ".ds-seg{display:inline-flex;border:1px solid #d6dccf;border-radius:999px;padding:2px;background:#fbfcf8}.ds-seg button{font:inherit;font-size:.9rem;color:#47564d;background:none;border:0;border-radius:999px;padding:5px 14px;cursor:pointer}.ds-seg button[aria-pressed=true]{background:#1b2822;color:#f3f5ee}.ds-seg button:focus-visible{outline:2px solid #c0772a;outline-offset:2px}"
+    },
+    {
+      "name": "Filter Field",
+      "kind": "input",
+      "refersTo": "filter-field",
+      "description": "Select and text input for the race table.",
+      "html": "<input class=\"ds-input\" placeholder=\"Search races\">",
+      "css": ".ds-input{font:inherit;width:100%;color:#1b2822;background:#fbfcf8;border:1px solid #d6dccf;border-radius:8px;padding:7px 8px;min-height:40px}.ds-input:focus-visible{outline:2px solid #c0772a;outline-offset:2px}"
+    },
+    {
+      "name": "Rating Chip",
+      "kind": "chip",
+      "refersTo": "rating-chip",
+      "description": "Lean label tinted by party wash.",
+      "html": "<span class=\"ds-rate\">Lean D</span>",
+      "css": ".ds-rate{display:inline-block;padding:1px 7px;border-radius:999px;font-size:.78rem;background:#dfe9f0;color:#1b2822}"
+    },
+    {
+      "name": "More Button",
+      "kind": "button",
+      "refersTo": "more-button",
+      "description": "Pill button that reveals more table rows.",
+      "html": "<button class=\"ds-more\">Show more</button>",
+      "css": ".ds-more{font:inherit;font-weight:500;color:#1b2822;background:#fbfcf8;border:1px solid #d6dccf;border-radius:999px;padding:8px 18px;cursor:pointer}.ds-more:hover{border-color:#647268}.ds-more:focus-visible{outline:2px solid #c0772a;outline-offset:2px}"
+    },
+    {
+      "name": "Chamber Tally",
+      "kind": "custom",
+      "refersTo": "numeral-display",
+      "description": "Giant condensed seat count with caption.",
+      "html": "<div class=\"ds-tally\"><b>218</b><small>Democrats</small></div>",
+      "css": ".ds-tally{display:flex;align-items:baseline;gap:8px}.ds-tally b{font:800 4rem/.9 'Big Shoulders Display','Arial Narrow',sans-serif;color:#2f6d9e}.ds-tally small{font-size:.9rem;color:#47564d}"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Results Page in the Meadow",
+    "overview": "A familiar news-site results page whose seat bars are alive: every seat is a blade of grass, every state a pebble. Cool lichen-white ground, pine-green ink, muted slate blue and brick red, moss neutrals. Hairline rules instead of cards; dark night theme on the same roles.",
+    "keyCharacteristics": [
+      "Hairline rules and whitespace carry structure; no cards, no shadows.",
+      "Party color is muted and always paired with a letter or label.",
+      "Big Shoulders numerals for counts and times; Schibsted Grotesk for everything else.",
+      "Hand-drawn naturalist details used sparingly as signatures."
+    ],
+    "rules": [
+      { "name": "The Muted Party Rule", "body": "Blue and red stay at the slate and brick values; soft and wash variants are for fills. Never use a saturated network blue or red.", "section": "colors" },
+      { "name": "The Pencil Rule", "body": "Orange means a human marked it: an upset, the current time, a watch race, or keyboard focus.", "section": "colors" },
+      { "name": "The Numerals Only Rule", "body": "Big Shoulders is for numbers, times, and the masthead title. Never set sentences in it.", "section": "typography" },
+      { "name": "The Hairline Rule", "body": "Separate with a 1px Rule line, not a card, shadow, or fill.", "section": "elevation" }
+    ],
+    "dos": [
+      "Do keep the results-page skeleton: masthead, jump links, hairline sections.",
+      "Do pair every party color with a letter or label (D, R, I).",
+      "Do use tabular numerals in all numeric columns.",
+      "Do keep the 2px Pencil focus ring on every interactive element.",
+      "Do define dark values by overriding the same custom properties."
+    ],
+    "donts": [
+      "Don't use KPI cards, gradient hero panels, or saturated party colors.",
+      "Don't use a serif or cream ground.",
+      "Don't add shadows for elevation.",
+      "Don't use Pencil Orange for decoration."
+    ]
+  }
+}
