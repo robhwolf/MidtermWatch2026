@@ -1,8 +1,8 @@
-// The seat meadow: one blade per seat, Democrats growing from the left and
-// Republicans from the right, so it reads as a seat bar. A ripple runs through
-// only when a race is called, so movement always means news.
+// The seat bar, drawn like a map's scale bar: one tick every 50 House seats or
+// 10 Senate seats, Democrats from the left, Republicans from the right, and a
+// benchmark at the majority. Leading seats are hatched so they read without
+// colour. A sweep runs across only when a race is called, so movement means news.
 
-const hash = n => { const x = Math.sin(n * 127.1) * 43758.5453; return x - Math.floor(x); };
 const color = name => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
 
 export function seatOrder(b) {
@@ -21,9 +21,9 @@ export function seatOrder(b) {
   return seq;
 }
 
-export class Meadow {
-  constructor(canvas, label) {
-    this.c = canvas; this.b = null; this.t = -1; this.label = label;
+export class SeatBar {
+  constructor(canvas) {
+    this.c = canvas; this.b = null; this.t = -1;
     this.quiet = matchMedia('(prefers-reduced-motion: reduce)').matches;
     new ResizeObserver(() => this.draw()).observe(canvas);
     matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => this.draw());
@@ -48,12 +48,11 @@ export class Meadow {
 
   set(b) { this.b = b; this.seq = seatOrder(b); this.draw(); }
 
-  ripple() {
+  sweep() {
     if (this.quiet) return;
-    this.t = 0;
     const start = performance.now();
     const step = now => {
-      this.t = (now - start) / 1500;
+      this.t = (now - start) / 900;
       this.draw();
       if (this.t < 1) requestAnimationFrame(step); else { this.t = -1; this.draw(); }
     };
@@ -61,7 +60,7 @@ export class Meadow {
   }
 
   draw() {
-    const { c, seq } = this;
+    const { c, seq, b } = this;
     if (!seq) return;
     const w = c.clientWidth, h = c.clientHeight, dpr = Math.min(devicePixelRatio || 1, 2);
     if (!w) return;
@@ -69,36 +68,45 @@ export class Meadow {
     const x = c.getContext('2d');
     x.setTransform(dpr, 0, 0, dpr, 0, 0);
     x.clearRect(0, 0, w, h);
-    const ink = {
-      won: { D: color('--d'), R: color('--r'), I: color('--i') },
-      leading: { D: color('--d-soft'), R: color('--r-soft'), I: color('--i') },
-    };
-    const blade = color('--blade');
-    const gap = w / seq.length;
-    const lw = Math.min(Math.max(gap * 0.82, 0.9), 7);
-    const ground = h - 1;
-    x.lineCap = 'round';
-    seq.forEach((s, i) => {
-      const rise = s.kind === 'won' ? 1 : s.kind === 'leading' ? 0.8 : 0.56;
-      const len = (h - 16) * rise * (0.84 + hash(i + 1) * 0.16);
-      const lean = (hash(i + 7) - 0.5) * Math.min(14, len * 0.2);
-      const px = gap * (i + 0.5);
-      const wave = this.t >= 0
-        ? Math.sin((i / seq.length - this.t * 1.6) * 16) * 13 * Math.sin(Math.PI * this.t)
-          * Math.exp(-(((i / seq.length - this.t) * 3.2) ** 2))
-        : 0;
-      x.strokeStyle = s.party ? ink[s.kind][s.party] : blade;
-      x.lineWidth = lw;
-      x.beginPath();
-      x.moveTo(px, ground);
-      x.quadraticCurveTo(px + (lean + wave) * 0.3, ground - len * 0.55, px + lean + wave, ground - len);
-      x.stroke();
-    });
-    const mid = this.majorityX(w);
-    x.strokeStyle = color('--ink');
-    x.lineWidth = 2;
-    x.beginPath(); x.moveTo(mid, 0); x.lineTo(mid, h); x.stroke();
-  }
+    const won = { D: color('--d'), R: color('--r'), I: color('--i') };
+    const leading = { D: color('--d-soft'), R: color('--r-soft'), I: color('--i') };
+    const ink = color('--ink'), paper = color('--raised');
+    const gap = w / seq.length, top = 8, tall = h - 20;
 
-  majorityX(w) { return w / 2; }
+    x.fillStyle = paper;
+    x.fillRect(0, top, w, tall);
+    seq.forEach((s, i) => {
+      if (s.kind === 'uncalled') return;
+      x.fillStyle = (s.kind === 'won' ? won : leading)[s.party];
+      x.fillRect(i * gap, top, gap + 0.6, tall);
+    });
+
+    x.save();
+    x.beginPath();
+    seq.forEach((s, i) => { if (s.kind === 'leading') x.rect(i * gap, top, gap + 0.6, tall); });
+    x.clip();
+    x.strokeStyle = paper;
+    x.lineWidth = 1.5;
+    for (let p = -tall; p < w; p += 7) { x.beginPath(); x.moveTo(p, top + tall); x.lineTo(p + tall, top); x.stroke(); }
+    x.restore();
+
+    if (this.t >= 0) {
+      x.fillStyle = paper;
+      x.globalAlpha = 0.55 * Math.sin(Math.PI * this.t);
+      x.fillRect(this.t * w - 24, top, 48, tall);
+      x.globalAlpha = 1;
+    }
+
+    x.strokeStyle = ink;
+    x.lineWidth = 1.5;
+    x.strokeRect(0.75, top, w - 1.5, tall);
+    x.fillStyle = ink;
+    const every = b.seats > 200 ? 50 : 10;
+    for (let t = 0; t <= b.seats; t += every) x.fillRect(Math.min(w - 1, (t / b.seats) * w), top + tall, 1.2, 6);
+
+    x.fillRect(w / 2 - 1, 0, 2, h - 4);
+    x.beginPath();
+    x.moveTo(w / 2 - 6, 0); x.lineTo(w / 2 + 6, 0); x.lineTo(w / 2, 8);
+    x.fill();
+  }
 }

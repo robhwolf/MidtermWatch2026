@@ -41,7 +41,7 @@ Set against Cook's own ratings rather than one network's narrative: every race i
 ## Brand Commitments
 
 - Name: Midterm Watch 2026.
-- Natural, organic look, avoiding AI design cliches.
+- Natural, organic look, avoiding AI design cliches. Chosen look: Topo Quad in Linen, brown and cream, with no background contour lines and no state map.
 - Red and blue party colours, muted, contrasting well against the natural look.
 - Clean and mobile-friendly.
 

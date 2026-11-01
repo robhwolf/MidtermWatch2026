@@ -2,8 +2,7 @@ import {
   RATING_ORDER, averageSwing, balance, bellwethers, dayTimeET, governors, isStale, isTossup, isUpset, isWatched,
   leader, margin, path, pollGroups, ratingParty, recentCalls, standing, staleLimitMinutes, swing, timeET,
 } from './model.js';
-import { Meadow } from './meadow.js';
-import { renderMap } from './pebbles.js';
+import { SeatBar } from './seatbar.js';
 
 const $ = id => document.getElementById(id);
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -20,8 +19,8 @@ const PAGE = 40;
 
 let doc = null, lastGood = null, loadError = null;
 let filters = { chamber: '', state: '', rating: 'competitive', status: '', q: '' };
-let mapChamber = 'senate', shown = PAGE, sortKey = 'default', openRow = null;
-const meadows = {};
+let shown = PAGE, sortKey = 'default', openRow = null;
+const bars = {};
 let knownCalls = null;
 
 function raceName(r) {
@@ -45,6 +44,7 @@ function ratingColors(rating) {
 }
 
 /* Header and alerts */
+const limitText = m => (m >= 60 ? `${m / 60}-hour` : `${m}-minute`);
 function renderStatus() {
   const now = Date.now();
   const at = doc?.generatedAt;
@@ -54,7 +54,7 @@ function renderStatus() {
   if (loadError) alerts.push('Could not reach the latest results. Showing the last ones loaded.');
   if (at && !doc.sample && isStale(at, now)) {
     const mins = Math.round((now - Date.parse(at)) / 60000);
-    alerts.push(`These results are ${mins >= 120 ? `${Math.round(mins / 60)} hours` : `${mins} minutes`} old, past the ${staleLimitMinutes(now)}-minute limit. The update job may be delayed.`);
+    alerts.push(`These results are ${mins >= 120 ? `${Math.round(mins / 60)} hours` : `${mins} minutes`} old, past the ${limitText(staleLimitMinutes(now))} limit. The update job may be delayed.`);
   }
   const down = (doc?.sources || []).filter(s => !s.ok && s.role === 'feed');
   if (down.length) alerts.push(`Source down: ${down.map(s => esc(s.name)).join(', ')}. Using the backup.`);
@@ -68,10 +68,10 @@ function renderBalance() {
   const host = $('chambers');
   for (const key of ['house', 'senate']) {
     const label = key === 'house' ? 'House' : 'Senate';
-    if (!meadows[key]) {
+    if (!bars[key]) {
       host.insertAdjacentHTML('beforeend', `<article class="chamber" id="c-${key}"><div class="head-slot"></div>
-        <canvas class="meadow ${key}-meadow" role="img"></canvas><div class="foot-slot"></div></article>`);
-      meadows[key] = new Meadow(host.querySelector(`#c-${key} canvas`), label);
+        <canvas class="seatbar" role="img"></canvas><div class="foot-slot"></div></article>`);
+      bars[key] = new SeatBar(host.querySelector(`#c-${key} canvas`));
     }
     const cfg = doc.chambers[key];
     const b = balance(doc.races, key, cfg);
@@ -83,7 +83,7 @@ function renderBalance() {
       <div class="tally R right"><small>Rep<br>${b.leading.R ? `+${b.leading.R} leading` : ''}</small><b>${b.won.R}</b></div></div>`;
     const cv = el.querySelector('canvas');
     cv.setAttribute('aria-label', `${label}: Democrats ${b.won.D} won, ${b.leading.D} leading. Republicans ${b.won.R} won, ${b.leading.R} leading. ${b.uncalled} uncalled.`);
-    meadows[key].set(b);
+    bars[key].set(b);
     const flips = b.flips.D + b.flips.R;
     const other = b.won.I + b.leading.I;
     el.querySelector('.foot-slot').innerHTML = `<div class="chamber-foot">
@@ -114,43 +114,6 @@ function cookStrip(chamber) {
   }).join('');
   const assumed = list.filter(r => r.cook?.assumed).length;
   return `<div class="cook-strip" aria-hidden="true">${seg}</div><p class="cook-note">Cook ratings, safest Democratic to safest Republican: ${rated.length} entered${assumed ? `, ${assumed} assumed Solid for the seat holder` : ''}.</p>`;
-}
-
-/* Map. Uncalled seats only ever use the soft shades, so a favourite can't be
-   mistaken for a win. */
-const FAVOURED = {
-  'Solid D': 'var(--d-soft)', 'Likely D': 'var(--d-soft)', 'Lean D': 'var(--d-wash)', 'Toss-up': 'var(--toss)',
-  'Lean R': 'var(--r-wash)', 'Likely R': 'var(--r-soft)', 'Solid R': 'var(--r-soft)',
-};
-function renderMapView() {
-  const byState = {};
-  for (const r of doc.races) if (r.chamber === mapChamber) (byState[r.state] ||= []).push(r);
-  const fills = {};
-  for (const [state, list] of Object.entries(byState)) {
-    const tone = r => {
-      const s = standing(r);
-      if (s.kind === 'won') return s.party === 'D' ? 'var(--d)' : s.party === 'R' ? 'var(--r)' : 'var(--i)';
-      if (s.kind === 'leading') return s.party === 'D' ? 'var(--d-soft)' : s.party === 'R' ? 'var(--r-soft)' : 'var(--i)';
-      return FAVOURED[r.cook?.rating] || 'var(--rule)';
-    };
-    const count = {};
-    for (const r of list) { const c = tone(r); count[c] = (count[c] || 0) + 1; }
-    const order = ['var(--d)', 'var(--d-soft)', 'var(--d-wash)', 'var(--toss)', 'var(--rule)', 'var(--r-wash)', 'var(--r-soft)', 'var(--r)', 'var(--i)'];
-    const parts = order.filter(c => count[c]).map(c => ({ color: c, share: count[c] / list.length }));
-    const top = parts.slice().sort((a, b) => b.share - a.share)[0].color;
-    const lines = list.length === 1
-      ? `${raceName(list[0])}: ${list[0].cook?.rating || 'Not rated'}${list[0].call ? `, called for ${list[0].call.name}` : ''}`
-      : `${state}: ${plural(list.length, 'race')}, ${list.filter(r => r.status === 'called').length} called`;
-    fills[state] = { parts, ink: top === 'var(--d)' || top === 'var(--r)' ? '#fff' : 'var(--ink)', label: esc(lines) };
-  }
-  renderMap($('map'), fills, filters.state, code => {
-    filters.state = filters.state === code ? '' : code;
-    filters.chamber = filters.state ? filters.chamber : '';
-    if (filters.state) filters.rating = '';
-    syncForm(); shown = PAGE; renderTable(); renderMapView();
-  });
-  const items = [['var(--d)', 'Won D'], ['var(--d-soft)', 'Ahead or favoured D'], ['var(--d-wash)', 'Lean D'], ['var(--toss)', 'Toss-up'], ['var(--r-wash)', 'Lean R'], ['var(--r-soft)', 'Ahead or favoured R'], ['var(--r)', 'Won R'], ['var(--raised)', 'No race this year']];
-  $('map-key').innerHTML = items.map(([c, t]) => `<span><i style="background:${c}"></i>${t}</span>`).join('');
 }
 
 /* Table */
@@ -391,7 +354,7 @@ function checkNewCalls() {
   const ids = new Set(doc.races.filter(r => r.status === 'called').map(r => r.id));
   if (knownCalls) {
     const fresh = doc.races.filter(r => ids.has(r.id) && !knownCalls.has(r.id));
-    for (const k of ['house', 'senate']) if (fresh.some(r => r.chamber === k)) meadows[k]?.ripple();
+    for (const k of ['house', 'senate']) if (fresh.some(r => r.chamber === k)) bars[k]?.sweep();
   }
   knownCalls = ids;
 }
@@ -399,7 +362,7 @@ function checkNewCalls() {
 function renderAll() {
   renderStatus();
   if (!doc) return;
-  renderBalance(); renderMapView(); renderTable(); renderUpsets(); renderTimeline(); renderPath(); renderSwing(); renderSources();
+  renderBalance(); renderTable(); renderUpsets(); renderTimeline(); renderPath(); renderSwing(); renderSources();
   checkNewCalls();
 }
 
@@ -425,15 +388,9 @@ function initControls() {
     + RATING_ORDER.map(r => `<option>${r}</option>`).join('') + `<option value="none">Not rated</option>`;
   f.addEventListener('input', e => {
     filters[e.target.name] = e.target.value;
-    shown = PAGE; renderTable(); if (e.target.name === 'state') renderMapView();
+    shown = PAGE; renderTable();
   });
   f.addEventListener('submit', e => e.preventDefault());
-  $('map-chamber').addEventListener('click', e => {
-    const b = e.target.closest('button'); if (!b) return;
-    mapChamber = b.dataset.v;
-    [...$('map-chamber').children].forEach(x => x.setAttribute('aria-pressed', x === b));
-    renderMapView();
-  });
   $('more').addEventListener('click', () => { shown += PAGE; renderTable(); });
   const toggle = tr => { openRow = openRow === tr.dataset.id ? null : tr.dataset.id; renderTable(); };
   $('table').addEventListener('click', e => {
@@ -450,7 +407,7 @@ function initControls() {
     const a = e.target.closest('[data-race]'); if (!a) return;
     const r = doc.races.find(x => x.id === a.dataset.race);
     filters = { chamber: '', state: r.state, rating: '', status: '', q: '' };
-    openRow = r.id; syncForm(); renderTable(); renderMapView();
+    openRow = r.id; syncForm(); renderTable();
   });
 }
 
