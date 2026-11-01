@@ -51,8 +51,11 @@ jobs:
       name: github-pages
       url: ${{ steps.deploy.outputs.page_url }}
     steps:
+      # main, not the commit that triggered the run: a queued run must start from
+      # the data the run before it committed.
       - uses: actions/checkout@v4
         with:
+          ref: main
           fetch-depth: 0
 
       - uses: actions/setup-node@v4
@@ -69,14 +72,24 @@ jobs:
         run: |
           git config user.name "midterm-watch-bot"
           git config user.email "actions@github.com"
-          git add site/data/results.json site/data/markets.json
-          git diff --staged --quiet && exit 0
-          git commit -m "data: $(date -u +'%Y-%m-%d %H:%M UTC')"
+          # These files are generated, so this run's copy simply replaces main's.
+          # Merging them could leave conflict markers in what gets published.
+          cp site/data/results.json site/data/markets.json "$RUNNER_TEMP/"
           for attempt in 1 2 3; do
-            git pull --rebase origin main && git push origin main && exit 0
+            if git fetch origin main && git reset --hard origin/main; then
+              cp "$RUNNER_TEMP/results.json" "$RUNNER_TEMP/markets.json" site/data/
+              git add site/data/results.json site/data/markets.json
+              git diff --staged --quiet && exit 0
+              git commit -m "data: $(date -u +'%Y-%m-%d %H:%M UTC')"
+              git push origin main && exit 0
+            fi
             sleep 5
           done
           echo "::warning::Could not push results; the site still deploys from this run"
+
+      # A bad file stops here, and the last good version stays online.
+      - name: Check the data files
+        run: node -e "for (const f of ['results', 'markets']) JSON.parse(require('fs').readFileSync('site/data/' + f + '.json', 'utf8'))"
 
       - uses: actions/upload-pages-artifact@v3
         with:
@@ -102,9 +115,12 @@ jobs:
           wait=$(node scripts/next-run.mjs)
           [ -n "$wait" ] || exit 0
           sleep "$wait"
-          # A newer chained run carries on instead, so there is only ever one chain.
+          # Only one chain: a newer chained run carries on instead, and a run from a
+          # push or the cron starts the next only if no chained run is going.
+          floor=$GITHUB_RUN_ID
+          [ "$GITHUB_EVENT_NAME" = workflow_dispatch ] || floor=0
           newer=$(gh run list --workflow refresh.yml --event workflow_dispatch --limit 20 --json databaseId,status \
-            --jq "[.[] | select(.status != \"completed\" and .databaseId > $GITHUB_RUN_ID)] | length") || newer=0
+            --jq "[.[] | select(.status != \"completed\" and .databaseId > $floor)] | length") || newer=0
           [ "$newer" = 0 ] || exit 0
           for attempt in 1 2 3 4; do
             gh workflow run refresh.yml --ref main && exit 0
