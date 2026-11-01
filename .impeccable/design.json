@@ -1,100 +1,140 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-10-31T00:00:00Z",
+  "generatedAt": "2026-11-01T01:30:00Z",
   "title": "Design System: Midterm Watch 2026",
   "extensions": {
     "colorMeta": {
-      "ground": { "role": "neutral", "displayName": "Lichen Ground", "canonical": "#f3f5ee", "tonalRamp": ["#141c18", "#1b2822", "#47564d", "#647268", "#cdd4c3", "#d6dccf", "#f3f5ee", "#fbfcf8"] },
-      "ink": { "role": "neutral", "displayName": "Pine Ink", "canonical": "#1b2822", "tonalRamp": ["#0c1210", "#141c18", "#1b2822", "#47564d", "#647268", "#93a297", "#b4c1b6", "#e8eee6"] },
-      "slate-blue": { "role": "primary", "displayName": "Slate Blue", "canonical": "#2f6d9e", "tonalRamp": ["#1f3240", "#24506f", "#2f6d9e", "#5a9bd0", "#8fb3cf", "#b8d0e2", "#dfe9f0", "#eef4f8"] },
-      "brick-red": { "role": "primary", "displayName": "Brick Red", "canonical": "#b8483e", "tonalRamp": ["#3a2522", "#8a4c44", "#b8483e", "#d9705f", "#dda59f", "#e8c3bf", "#f4e2df", "#faf0ee"] },
-      "pencil": { "role": "tertiary", "displayName": "Pencil Orange", "canonical": "#c0772a", "tonalRamp": ["#43361a", "#7a4c14", "#c0772a", "#e5a35a", "#e7a86a", "#f0c79a", "#f5e7c4", "#fbf3e2"] }
+      "linen-ground": { "role": "neutral", "displayName": "Linen Ground", "canonical": "#f8f3e9", "tonalRamp": ["#2b2018", "#4d3d2f", "#6c5e4b", "#9a7b56", "#cdbda5", "#e4dacb", "#f8f3e9", "#fffcf5"] },
+      "brown-ink": { "role": "neutral", "displayName": "Brown Ink", "canonical": "#2f261b", "tonalRamp": ["#1a140d", "#2f261b", "#5a4d3c", "#6c5e4b", "#8f806a", "#b3a28b", "#d8ccb9", "#f0e5d2"] },
+      "contour-brown": { "role": "neutral", "displayName": "Contour Brown", "canonical": "#9a7b56", "tonalRamp": ["#2f261b", "#4d3d2f", "#6e563a", "#9a7b56", "#b79c78", "#cfb99a", "#e4dacb", "#f3ece0"] },
+      "slate-blue": { "role": "primary", "displayName": "Slate Blue", "canonical": "#2f6d9e", "tonalRamp": ["#14293b", "#1d4466", "#2f6d9e", "#5a9bd0", "#8fb3cf", "#b9d0e0", "#e0e8ea", "#f2f6f7"] },
+      "brick-red": { "role": "primary", "displayName": "Brick Red", "canonical": "#b8483e", "tonalRamp": ["#3a1814", "#6e2b25", "#8c4d42", "#b8483e", "#d9705f", "#dda59f", "#f6e1d6", "#fbf0ea"] },
+      "heather": { "role": "secondary", "displayName": "Heather", "canonical": "#6d5e8c", "tonalRamp": ["#262034", "#3d3454", "#554a70", "#6d5e8c", "#ad9dcc", "#c8bddc", "#e2dcec", "#f3f0f7"] },
+      "pencil": { "role": "secondary", "displayName": "Pencil", "canonical": "#a4530f", "tonalRamp": ["#3a1d05", "#6e3809", "#a4530f", "#c7742a", "#e5a35a", "#efc28f", "#f7dfc2", "#fbf1e3"] },
+      "toss-straw": { "role": "tertiary", "displayName": "Toss Straw", "canonical": "#dcc58e", "tonalRamp": ["#4f3f0e", "#6f5a1f", "#94803f", "#b9a066", "#dcc58e", "#f3e6c4", "#f8efd9", "#fcf8ec"] }
     },
     "typographyMeta": {
-      "numeral-display": { "displayName": "Numeral Display", "purpose": "Giant chamber counts." },
-      "headline": { "displayName": "Headline", "purpose": "Section headings." },
-      "body": { "displayName": "Body", "purpose": "Running text and table text." }
+      "numeral-display": { "displayName": "Numeral Display", "purpose": "Chamber seat tallies in party color." },
+      "masthead": { "displayName": "Masthead", "purpose": "Uppercase site title." },
+      "legend-head": { "displayName": "Legend Head", "purpose": "Section heads, uppercase with a tick ruler beneath." },
+      "legend-sub": { "displayName": "Legend Sub", "purpose": "Sub-heads and table column heads." },
+      "body": { "displayName": "Body", "purpose": "Running text and rows." },
+      "small": { "displayName": "Small", "purpose": "Captions, footers, row sublines." }
     },
     "shadows": [
-      { "name": "chip-ring", "value": "inset 0 0 0 1px var(--rule)", "purpose": "Border-like ring on watch pills and assumed ratings; not elevation." }
+      { "name": "none", "value": "none", "purpose": "The system is flat; depth is tint, hairline and frame. Inset 1px rings only draw pill outlines." }
     ],
     "motion": [
-      { "name": "smooth-scroll", "value": "scroll-behavior: smooth", "purpose": "Jump links; disabled under prefers-reduced-motion." }
+      { "name": "seat-sweep", "value": "900ms linear, paper band 48px wide, peak alpha 0.55", "purpose": "Runs across a seat bar only when a race is called. Disabled under reduced motion." },
+      { "name": "smooth-scroll", "value": "scroll-behavior: smooth", "purpose": "Jump links; off under reduced motion." }
     ],
     "breakpoints": [
-      { "name": "sm", "value": "640px" },
-      { "name": "map-split", "value": "900px" }
+      { "name": "phone", "value": "640px" }
     ]
   },
   "components": [
     {
-      "name": "Segmented Toggle",
-      "kind": "chip",
-      "refersTo": "segmented-toggle",
-      "description": "Pill switch for map views.",
-      "html": "<div class=\"ds-seg\"><button aria-pressed=\"true\">Rating</button><button aria-pressed=\"false\">Margin</button></div>",
-      "css": ".ds-seg{display:inline-flex;border:1px solid #d6dccf;border-radius:999px;padding:2px;background:#fbfcf8}.ds-seg button{font:inherit;font-size:.9rem;color:#47564d;background:none;border:0;border-radius:999px;padding:5px 14px;cursor:pointer}.ds-seg button[aria-pressed=true]{background:#1b2822;color:#f3f5ee}.ds-seg button:focus-visible{outline:2px solid #c0772a;outline-offset:2px}"
+      "name": "Seat Scale Bar",
+      "kind": "custom",
+      "refersTo": "table-sheet",
+      "description": "The signature: seats as a scale bar with ticks, hatched leading seats, and a majority benchmark.",
+      "html": "<div class=\"ds-bar\"><div class=\"ds-bar-track\"><i class=\"ds-d\"></i><i class=\"ds-dl\"></i><i class=\"ds-rl\"></i><i class=\"ds-r\"></i></div><span class=\"ds-bench\"></span></div>",
+      "css": ".ds-bar { position: relative; height: 50px; padding-top: 8px; } .ds-bar-track { display: flex; height: 30px; background: var(--raised, #fffcf5); border: 1.5px solid var(--ink, #2f261b); } .ds-bar-track i { display: block; } .ds-d { width: 40%; background: #2f6d9e; } .ds-dl { width: 8%; background: repeating-linear-gradient(135deg, #8fb3cf 0 5px, #fffcf5 5px 6.5px); } .ds-rl { margin-left: auto; width: 6%; background: repeating-linear-gradient(135deg, #dda59f 0 5px, #fffcf5 5px 6.5px); } .ds-r { width: 30%; background: #b8483e; } .ds-bench { position: absolute; left: 50%; top: 0; bottom: 4px; width: 2px; margin-left: -1px; background: var(--ink, #2f261b); }"
     },
     {
-      "name": "Filter Field",
-      "kind": "input",
-      "refersTo": "filter-field",
-      "description": "Select and text input for the race table.",
-      "html": "<input class=\"ds-input\" placeholder=\"Search races\">",
-      "css": ".ds-input{font:inherit;width:100%;color:#1b2822;background:#fbfcf8;border:1px solid #d6dccf;border-radius:8px;padding:7px 8px;min-height:40px}.ds-input:focus-visible{outline:2px solid #c0772a;outline-offset:2px}"
-    },
-    {
-      "name": "Rating Chip",
-      "kind": "chip",
-      "refersTo": "rating-chip",
-      "description": "Lean label tinted by party wash.",
-      "html": "<span class=\"ds-rate\">Lean D</span>",
-      "css": ".ds-rate{display:inline-block;padding:1px 7px;border-radius:999px;font-size:.78rem;background:#dfe9f0;color:#1b2822}"
-    },
-    {
-      "name": "More Button",
-      "kind": "button",
-      "refersTo": "more-button",
-      "description": "Pill button that reveals more table rows.",
-      "html": "<button class=\"ds-more\">Show more</button>",
-      "css": ".ds-more{font:inherit;font-weight:500;color:#1b2822;background:#fbfcf8;border:1px solid #d6dccf;border-radius:999px;padding:8px 18px;cursor:pointer}.ds-more:hover{border-color:#647268}.ds-more:focus-visible{outline:2px solid #c0772a;outline-offset:2px}"
+      "name": "Legend Head",
+      "kind": "custom",
+      "refersTo": "legend-head",
+      "description": "Section heading: ink rule above, uppercase narrow face, tick ruler beneath.",
+      "html": "<section class=\"ds-sec\"><h2 class=\"ds-head\">Races to watch</h2></section>",
+      "css": ".ds-sec { border-top: 2px solid #2f261b; padding-block: 24px; } .ds-head { margin: 0; font: 700 1.45rem/1.2 'Archivo Narrow', 'Arial Narrow', sans-serif; letter-spacing: .06em; text-transform: uppercase; color: #2f261b; } .ds-head::after { content: ''; display: block; width: 120px; height: 7px; margin-top: 6px; border-bottom: 1.5px solid #2f261b; background: repeating-linear-gradient(90deg, #2f261b 0 1.5px, transparent 1.5px 12px); }"
     },
     {
       "name": "Chamber Tally",
       "kind": "custom",
       "refersTo": "numeral-display",
-      "description": "Giant condensed seat count with caption.",
-      "html": "<div class=\"ds-tally\"><b>218</b><small>Democrats</small></div>",
-      "css": ".ds-tally{display:flex;align-items:baseline;gap:8px}.ds-tally b{font:800 4rem/.9 'Big Shoulders Display','Arial Narrow',sans-serif;color:#2f6d9e}.ds-tally small{font-size:.9rem;color:#47564d}"
+      "description": "Large narrow numerals in party color with a small caption.",
+      "html": "<div class=\"ds-tally\"><b>212</b><small>Democrats won or leading</small></div>",
+      "css": ".ds-tally { display: flex; align-items: baseline; gap: 8px; } .ds-tally b { font: 700 4.5rem/.9 'Archivo Narrow', 'Arial Narrow', sans-serif; color: #2f6d9e; } .ds-tally small { font: 400 .9rem/1.2 'Source Sans 3', system-ui, sans-serif; color: #5a4d3c; }"
+    },
+    {
+      "name": "Sheet Table",
+      "kind": "card",
+      "refersTo": "table-sheet",
+      "description": "Races table in a raised, contour-framed block with uppercase narrow column heads.",
+      "html": "<div class=\"ds-scroll\"><table class=\"ds-table\"><thead><tr><th>Race</th><th>Cook</th></tr></thead><tbody><tr><td>NE-02</td><td><span class=\"ds-rate\">Toss-up</span></td></tr></tbody></table></div>",
+      "css": ".ds-scroll { background: #fffcf5; border: 1px solid #9a7b56; } .ds-table { width: 100%; border-collapse: collapse; font: 400 .93rem 'Source Sans 3', system-ui, sans-serif; color: #2f261b; } .ds-table th { text-align: left; padding: 6px 8px; font: 500 .78rem 'Archivo Narrow', 'Arial Narrow', sans-serif; letter-spacing: .04em; text-transform: uppercase; color: #5a4d3c; border-bottom: 1.5px solid #2f261b; } .ds-table td { padding: 8px; border-bottom: 1px solid #e4dacb; } .ds-table tr:hover td { background: #fffcf5; } .ds-rate { display: inline-block; padding: 1px 7px; border-radius: 999px; font-size: .78rem; background: #dcc58e; color: #2f261b; }"
+    },
+    {
+      "name": "Filter Field",
+      "kind": "input",
+      "refersTo": "field",
+      "description": "Select or text input on raised paper with a contour border.",
+      "html": "<label class=\"ds-label\">State<input class=\"ds-field\" value=\"Ohio\"></label>",
+      "css": ".ds-label { display: grid; gap: 2px; font: 400 .8rem 'Source Sans 3', system-ui, sans-serif; color: #5a4d3c; } .ds-field { min-height: 40px; padding: 7px 8px; font: 400 1rem 'Source Sans 3', system-ui, sans-serif; color: #2f261b; background: #fffcf5; border: 1px solid #9a7b56; border-radius: 3px; } .ds-field:focus-visible { outline: 2px solid #a4530f; outline-offset: 2px; }"
+    },
+    {
+      "name": "Show More Button",
+      "kind": "button",
+      "refersTo": "button-more",
+      "description": "Single secondary action, paper with a hairline border.",
+      "html": "<button class=\"ds-more\">Show more races</button>",
+      "css": ".ds-more { font: 500 1rem 'Source Sans 3', system-ui, sans-serif; color: #2f261b; background: #fffcf5; border: 1px solid #e4dacb; border-radius: 3px; padding: 8px 18px; cursor: pointer; } .ds-more:hover { border-color: #9a7b56; } .ds-more:focus-visible { outline: 2px solid #a4530f; outline-offset: 2px; }"
+    },
+    {
+      "name": "Party Tile",
+      "kind": "chip",
+      "refersTo": "party-tile-dem",
+      "description": "Small square party initial beside a candidate name.",
+      "html": "<span class=\"ds-pty\">D</span>",
+      "css": ".ds-pty { display: inline-grid; place-items: center; width: 1.45em; height: 1.45em; border-radius: 3px; background: #2f6d9e; color: #fff; font: 700 .78rem 'Source Sans 3', system-ui, sans-serif; }"
+    },
+    {
+      "name": "Timeline Wave",
+      "kind": "nav",
+      "refersTo": "legend-sub",
+      "description": "Poll-close wave on a dashed trail with a triangle waypoint.",
+      "html": "<div class=\"ds-tl\"><div class=\"ds-wave\"><p>7:00 PM ET</p></div></div>",
+      "css": ".ds-tl { position: relative; padding-left: 26px; } .ds-tl::before { content: ''; position: absolute; left: 9px; top: 6px; bottom: 6px; border-left: 3px dashed #9a7b56; } .ds-wave { position: relative; } .ds-wave::before { content: ''; position: absolute; left: -22px; top: 5px; width: 14px; height: 13px; background: #9a7b56; clip-path: polygon(50% 0, 100% 100%, 0 100%); } .ds-wave p { margin: 0; font: 700 1.5rem/1.2 'Archivo Narrow', 'Arial Narrow', sans-serif; color: #2f261b; }"
+    },
+    {
+      "name": "Upset Ring",
+      "kind": "custom",
+      "refersTo": "legend-sub",
+      "description": "Pencil ellipse drawn around an upset race name.",
+      "html": "<span class=\"ds-ring\"><svg viewBox=\"0 0 100 28\" preserveAspectRatio=\"none\" aria-hidden=\"true\"><path d=\"M6 13C10 4 34 1 58 2S99 8 97 15 74 25 48 25 3 22 4 13C5 8 12 5 20 4\"/></svg>OH-09</span>",
+      "css": ".ds-ring { position: relative; display: inline-block; min-width: 104px; text-align: center; padding: 2px 10px; font: 700 1rem 'Source Sans 3', system-ui, sans-serif; color: #2f261b; } .ds-ring svg { position: absolute; inset: -6px -8px; width: calc(100% + 16px); height: calc(100% + 12px); overflow: visible; } .ds-ring path { fill: none; stroke: #a4530f; stroke-width: 2; stroke-linecap: round; vector-effect: non-scaling-stroke; }"
     }
   ],
   "narrative": {
-    "northStar": "The Results Page in the Meadow",
-    "overview": "A familiar news-site results page whose seat bars are alive: every seat is a blade of grass, every state a pebble. Cool lichen-white ground, pine-green ink, muted slate blue and brick red, moss neutrals. Hairline rules instead of cards; dark night theme on the same roles.",
+    "northStar": "The Survey Sheet",
+    "overview": "The page is a results sheet drawn like a topographic quad: linen paper, brown ink, a muted slate blue and brick red for the two parties. Counts are read off scale bars the way distance is read off a map's scale, not off KPI cards. Every section opens on a heavy ruler rule and a legend-style heading with a short tick ruler under it. Dark mode is Walnut, the same sheet by lamplight, with the same hues lifted for contrast.\n\nThe density is that of a newspaper results table: hairline rules between rows, no card chrome, no ambient decoration. There are no background contour lines and no map; the survey language lives only in functional marks (scale bar, benchmark, ruler rules, dashed trail, pencil ring). The palette is brown and cream rather than green; the outdoorsy-map look and the KPI-card dashboard are both refused.\n\nThe only motion is the sweep across a seat bar when a race is called, so movement means news. Scroll is smooth unless reduced motion is requested.",
     "keyCharacteristics": [
-      "Hairline rules and whitespace carry structure; no cards, no shadows.",
-      "Party color is muted and always paired with a letter or label.",
-      "Big Shoulders numerals for counts and times; Schibsted Grotesk for everything else.",
-      "Hand-drawn naturalist details used sparingly as signatures."
+      "Linen ground, brown ink, two party hues and one pencil-orange for human marks.",
+      "Archivo Narrow for numerals and legend heads; Source Sans 3 for all running text.",
+      "Seat scale bar with a majority benchmark as the signature.",
+      "Flat: depth from rules and a raised-paper tint, never shadows.",
+      "Square-ish corners (3px) everywhere except rating pills."
     ],
     "rules": [
-      { "name": "The Muted Party Rule", "body": "Blue and red stay at the slate and brick values; soft and wash variants are for fills. Never use a saturated network blue or red.", "section": "colors" },
-      { "name": "The Pencil Rule", "body": "Orange means a human marked it: an upset, the current time, a watch race, or keyboard focus.", "section": "colors" },
-      { "name": "The Numerals Only Rule", "body": "Big Shoulders is for numbers, times, and the masthead title. Never set sentences in it.", "section": "typography" },
-      { "name": "The Hairline Rule", "body": "Separate with a 1px Rule line, not a card, shadow, or fill.", "section": "elevation" }
+      { "name": "The Party Hue Rule", "body": "Blue and red mean Democrat and Republican and nothing else; heather means Independent. Status, emphasis and annotation use ink or pencil.", "section": "colors" },
+      { "name": "The Pencil Rule", "body": "Pencil orange marks only what a person would mark by hand on a printed sheet: focus, now, upset, watch-list bell. It never fills a surface.", "section": "colors" },
+      { "name": "The No-Color-Alone Rule", "body": "Leading versus won is carried by hatching as well as tint, and ratings by label text as well as chip color.", "section": "colors" },
+      { "name": "The Numerals Rule", "body": "Counts, times and tallies set in Archivo Narrow; anything read as a sentence sets in Source Sans 3. Tabular figures in tables and market readouts.", "section": "typography" },
+      { "name": "The Flat Sheet Rule", "body": "A surface is distinguished by tint, rule or frame, never by a drop shadow.", "section": "elevation" }
     ],
     "dos": [
-      "Do keep the results-page skeleton: masthead, jump links, hairline sections.",
-      "Do pair every party color with a letter or label (D, R, I).",
-      "Do use tabular numerals in all numeric columns.",
-      "Do keep the 2px Pencil focus ring on every interactive element.",
-      "Do define dark values by overriding the same custom properties."
+      "Do show counts over a seat scale bar with the majority benchmark, not in a card.",
+      "Do open each section with a 2px ink rule and an uppercase Archivo Narrow legend head with the 120px tick ruler.",
+      "Do keep blue and red for party, pencil for hand marks, and carry leading versus won by hatching.",
+      "Do separate surfaces with tint, hairline or frame; set the page in both Linen and Walnut with the same token names.",
+      "Do animate only a sweep on a real call, and honor reduced motion."
     ],
     "donts": [
-      "Don't use KPI cards, gradient hero panels, or saturated party colors.",
-      "Don't use a serif or cream ground.",
-      "Don't add shadows for elevation.",
-      "Don't use Pencil Orange for decoration."
+      "Don't use KPI cards, tinted stat tiles, or shadows to build hierarchy.",
+      "Don't return to green, outdoorsy map costume, background contour lines, or a state map.",
+      "Don't use party hues for non-party status, or color alone to separate leading from won.",
+      "Don't use Archivo Narrow for running sentences or Source Sans 3 for tallies."
     ]
   }
 }
