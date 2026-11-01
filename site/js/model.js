@@ -107,6 +107,9 @@ export function pollGroups(races, closings) {
   return [...groups.values()].sort((a, b) => a.at.localeCompare(b.at));
 }
 
+// A state with two closing times counts from its first, as the timeline does.
+export const closesBy = (r, closings, at) => closings.states[r.state]?.first <= at;
+
 export const isWatched = r => ['Toss-up', 'Lean D', 'Lean R'].includes(r.cook?.rating) && !r.cook.assumed;
 
 // Toss-up and Lean races in the states whose polls close first. Those groups

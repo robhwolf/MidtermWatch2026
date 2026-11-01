@@ -6,7 +6,7 @@ import { candlePoints, midPrices } from '../scripts/lib/markets.mjs';
 import { applyOverride, mergeRace } from '../scripts/lib/merge.mjs';
 import { nextRun } from '../scripts/lib/next-run.mjs';
 import { csvRows, parseRatings, resolveRating } from '../scripts/lib/ratings.mjs';
-import { averageSwing, balance, isStale, isUpset, margin, path, staleLimitMinutes, timeET } from '../site/js/model.js';
+import { averageSwing, balance, closesBy, isStale, isUpset, margin, path, staleLimitMinutes, timeET } from '../site/js/model.js';
 
 const NIGHT = '2026-11-04T02:00:00.000Z';
 const rec = (o = {}) => ({
@@ -146,6 +146,17 @@ test('ratings CSV finds the race from chamber, state and district', () => {
   const { ratings, problems } = parseRatings('race,chamber,state,district,rating\nGray,House,CA,13,Likely D\nBegich III,House,AK,AL,Toss Up\nOPEN,Senate,NC,,Likely D\nOPEN,Governor,GA,,Toss Up\n');
   assert.deepEqual(ratings, { 'CA-H-13': 'Likely D', 'AK-H-1': 'Toss-up', 'NC-S': 'Likely D', 'GA-G': 'Toss-up' });
   assert.deepEqual(problems, []);
+});
+
+test('Poll closing filter includes the chosen time and earlier', () => {
+  const closings = { states: {
+    IN: { first: '2026-11-03T23:00:00.000Z', last: '2026-11-04T00:00:00.000Z' },
+    OH: { first: '2026-11-04T00:30:00.000Z', last: '2026-11-04T00:30:00.000Z' },
+  } };
+  assert.equal(closesBy({ state: 'IN' }, closings, '2026-11-03T23:00:00.000Z'), true);
+  assert.equal(closesBy({ state: 'OH' }, closings, '2026-11-04T00:30:00.000Z'), true);
+  assert.equal(closesBy({ state: 'OH' }, closings, '2026-11-04T00:00:00.000Z'), false);
+  assert.equal(closesBy({ state: 'ZZ' }, closings, '2026-11-04T00:00:00.000Z'), false);
 });
 
 test('ratings CSV forgives spelling and reports the rest', () => {

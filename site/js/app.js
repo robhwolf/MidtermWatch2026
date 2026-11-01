@@ -1,5 +1,5 @@
 import {
-  RATING_ORDER, averageSwing, balance, bellwethers, dayET, dayTimeET, governors, isStale, isTossup, isUpset, isWatched,
+  RATING_ORDER, averageSwing, balance, bellwethers, closesBy, dayET, dayTimeET, governors, isStale, isTossup, isUpset, isWatched,
   leader, margin, path, pollGroups, ratingParty, recentCalls, standing, staleLimitMinutes, swing, timeET,
 } from './model.js';
 import { SeatBar } from './seatbar.js';
@@ -19,7 +19,7 @@ const REFRESH_MS = 60000;
 const PAGE = 40;
 
 let doc = null, lastGood = null, loadError = null;
-let filters = { chamber: '', state: '', rating: 'competitive', status: '', q: '' };
+let filters = { chamber: '', state: '', rating: 'competitive', status: '', closing: '', q: '' };
 let shown = PAGE, sortKey = 'default', openRow = null;
 const bars = {};
 let knownCalls = null;
@@ -126,6 +126,7 @@ function matches(r) {
   if (filters.chamber && r.chamber !== filters.chamber) return false;
   if (filters.state && r.state !== filters.state) return false;
   if (filters.status && r.status !== filters.status) return false;
+  if (filters.closing && !closesBy(r, doc.closings, filters.closing)) return false;
   if (filters.rating === 'competitive') {
     const anyRated = doc.races.some(x => x.cook?.rating && !x.cook.assumed);
     if (anyRated && !(r.cook?.rating && !/^Solid/.test(r.cook.rating))) return false;
@@ -439,7 +440,7 @@ function initControls() {
   $('latest').addEventListener('click', e => {
     const a = e.target.closest('[data-race]'); if (!a) return;
     const r = doc.races.find(x => x.id === a.dataset.race);
-    filters = { chamber: '', state: r.state, rating: '', status: '', q: '' };
+    filters = { chamber: '', state: r.state, rating: '', status: '', closing: '', q: '' };
     openRow = r.id; syncForm(); renderTable();
   });
 }
@@ -451,9 +452,14 @@ function initStates() {
     .map(([s, n]) => `<option value="${esc(s)}">${esc(n || s)}</option>`).join('');
 }
 
+function initClosings() {
+  $('filters').elements.closing.innerHTML = `<option value="">All</option>`
+    + pollGroups(doc.races, doc.closings).map(g => `<option value="${g.at}">By ${timeET(g.at)}</option>`).join('');
+}
+
 initControls();
 await load();
-if (doc) initStates();
+if (doc) { initStates(); initClosings(); }
 loadMarkets();
 setInterval(load, REFRESH_MS);
 setInterval(loadMarkets, REFRESH_MS * 5);
