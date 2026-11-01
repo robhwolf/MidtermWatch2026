@@ -4,6 +4,7 @@ import { test } from 'node:test';
 import { parseCnn, parseNpr, parseNyt } from '../scripts/lib/feeds.mjs';
 import { midPrices } from '../scripts/lib/markets.mjs';
 import { applyOverride, mergeRace } from '../scripts/lib/merge.mjs';
+import { nextRun } from '../scripts/lib/next-run.mjs';
 import { csvRows, parseRatings, resolveRating } from '../scripts/lib/ratings.mjs';
 import { averageSwing, balance, isStale, isUpset, margin, path, staleLimitMinutes, timeET } from '../site/js/model.js';
 
@@ -12,6 +13,18 @@ const rec = (o = {}) => ({
   id: 'NC-S', chamber: 'senate', source: 'nyt', sourceUrl: 'u', updatedAt: NIGHT, votes: 100, reporting: 40,
   candidates: [{ name: 'A', party: 'D', votes: 60, pct: 60 }, { name: 'B', party: 'R', votes: 40, pct: 40 }],
   call: null, runoff: false, ...o,
+});
+
+test('Run chain follows the schedule and stops after the runoffs', () => {
+  const at = iso => new Date(nextRun(Date.parse(iso))).toISOString();
+  assert.equal(at('2026-11-01T03:30:00Z'), '2026-11-01T04:07:00.000Z');
+  assert.equal(at('2026-11-03T22:30:00Z'), '2026-11-03T22:42:00.000Z');
+  assert.equal(at('2026-11-03T22:42:30Z'), '2026-11-03T22:47:00.000Z');
+  assert.equal(at('2026-11-04T02:03:00Z'), '2026-11-04T02:07:00.000Z');
+  assert.equal(at('2026-11-04T02:06:50Z'), '2026-11-04T02:12:00.000Z');
+  assert.equal(at('2026-11-04T15:03:00Z'), '2026-11-04T15:07:00.000Z');
+  assert.equal(at('2026-12-13T23:30:00Z'), '2026-12-14T00:07:00.000Z');
+  assert.equal(nextRun(Date.parse('2026-12-14T00:10:00Z')), null);
 });
 
 test('NYT parser reads a called race', () => {

@@ -61,7 +61,7 @@ Correct the votes or percent reporting:
 
 `party` is `D`, `R` or `I`. Several races go in one file, separated by commas. Delete an entry to hand the race back to the feeds. Overrides stick, so a corrected count stops updating until you remove it.
 
-Actions shows each run. To force one, use **Actions > Refresh results > Run workflow**.
+Actions shows each run. To force one, use **Actions > Refresh results > Run workflow**. A run stays open after refreshing while it waits to start the next one; that is normal.
 
 ## Where the data comes from
 
@@ -83,11 +83,13 @@ Votes or calls seen before 6 pm ET on 3 November are discarded as rehearsal data
 
 ## Schedule
 
-Times are ET. GitHub can run these 5 to 10 minutes late.
+Times are ET.
 
-- Until Election Day: 8 am and 8 pm
-- 3 Nov, 6 pm to 4 Nov, 10 am: every 5 minutes
+- Until Election Day: hourly
+- 3 Nov, 5:42 pm to 4 Nov, 10 am: every 5 minutes
 - After that, hourly until 13 December, the day after Louisiana's runoffs
+
+GitHub's cron did not fire on this repo when tested, so each run waits for the next slot and starts the next run itself. The crons in `refresh.yml` stay as a backup and run at 8 am and 8 pm until Election Day. If the updates stop, **Actions > Refresh results > Run workflow** restarts the chain.
 
 The stale warning shows after 20 minutes on election night, 13 hours before it, and 2 hours in the hourly phase.
 

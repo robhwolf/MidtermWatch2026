@@ -4,9 +4,8 @@ on:
   schedule:
     # All crons are UTC. Clocks fall back on 1 Nov, so ET is UTC-5 for all of these.
     # GitHub can run these 5 to 10 minutes late, and can skip runs under load.
-
-    # Temporary test of the scheduler, tonight only. Remove after confirming.
-    - cron: '12,27,42,57 2-3 1 11 *'
+    # None fired in this repo's first hours, so the next job below keeps the
+    # schedule itself. These stay to restart the chain if it ever breaks.
 
     # Before Election Day: 8am and 8pm ET.
     - cron: '0 13 1-3 11 *'
@@ -39,15 +38,15 @@ permissions:
   contents: write
   pages: write
   id-token: write
-
-concurrency:
-  group: refresh
-  cancel-in-progress: false
+  actions: write
 
 jobs:
   refresh:
     runs-on: ubuntu-latest
     timeout-minutes: 8
+    concurrency:
+      group: refresh
+      cancel-in-progress: false
     environment:
       name: github-pages
       url: ${{ steps.deploy.outputs.page_url }}
@@ -85,3 +84,30 @@ jobs:
 
       - id: deploy
         uses: actions/deploy-pages@v4
+
+  # Waits for the next slot, then starts the next run, even if this one failed.
+  next:
+    needs: refresh
+    if: always()
+    runs-on: ubuntu-latest
+    timeout-minutes: 75
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Start the next run
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          wait=$(node scripts/next-run.mjs)
+          [ -n "$wait" ] || exit 0
+          sleep "$wait"
+          # A newer chained run carries on instead, so there is only ever one chain.
+          newer=$(gh run list --workflow refresh.yml --event workflow_dispatch --limit 20 --json databaseId,status \
+            --jq "[.[] | select(.status != \"completed\" and .databaseId > $GITHUB_RUN_ID)] | length") || newer=0
+          [ "$newer" = 0 ] || exit 0
+          for attempt in 1 2 3 4; do
+            gh workflow run refresh.yml --ref main && exit 0
+            sleep 15
+          done
+          exit 1
