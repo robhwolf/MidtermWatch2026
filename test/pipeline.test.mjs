@@ -142,6 +142,12 @@ test('market midpoints, with last price as the fallback', () => {
   assert.equal(midPrices([{ ticker: 'E-D', last_price_dollars: '0.5' }], 'E'), null);
 });
 
+test('ratings CSV finds the race from chamber, state and district', () => {
+  const { ratings, problems } = parseRatings('race,chamber,state,district,rating\nGray,House,CA,13,Likely D\nBegich III,House,AK,AL,Toss Up\nOPEN,Senate,NC,,Likely D\nOPEN,Governor,GA,,Toss Up\n');
+  assert.deepEqual(ratings, { 'CA-H-13': 'Likely D', 'AK-H-1': 'Toss-up', 'NC-S': 'Likely D', 'GA-G': 'Toss-up' });
+  assert.deepEqual(problems, []);
+});
+
 test('ratings CSV forgives spelling and reports the rest', () => {
   const { ratings, problems } = parseRatings('race,chamber,state,district,rating\nNC-S,senate,NC,,toss up\r\nME-S,senate,ME,,lean  d\nGA-S,senate,GA,,maybe\nOH-S,senate,OH,,\n');
   assert.deepEqual(ratings, { 'NC-S': 'Toss-up', 'ME-S': 'Lean D' });

@@ -28,12 +28,25 @@ export function csvRows(text) {
   return rows;
 }
 
+// The race column may hold an id or a candidate's name, so the id comes from
+// chamber, state and district when they are there.
+function raceId(chamberText, stateText, districtText) {
+  const chamber = (chamberText || '').trim().toLowerCase();
+  const state = (stateText || '').trim().toUpperCase();
+  const district = (districtText || '').trim();
+  if (!state) return null;
+  if (chamber === 'senate') return `${state}-S`;
+  if (chamber === 'governor') return `${state}-G`;
+  if (chamber !== 'house' || !district) return null;
+  return `${state}-H-${/^(al|0)$/i.test(district) ? 1 : Number(district)}`;
+}
+
 export function parseRatings(text) {
   const [head, ...rows] = csvRows(text);
   const col = Object.fromEntries((head || []).map((h, i) => [h.trim().toLowerCase(), i]));
   const ratings = {}, problems = [];
   for (const row of rows) {
-    const id = (row[col.race] || '').trim();
+    const id = raceId(row[col.chamber], row[col.state], row[col.district]) || (row[col.race] || '').trim();
     const raw = (row[col.rating] || '').trim();
     if (!id || !raw) continue;
     const rating = ALIASES[raw.toLowerCase().replace(/\s+/g, ' ')];

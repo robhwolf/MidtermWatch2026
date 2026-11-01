@@ -116,10 +116,15 @@ async function main() {
   });
 
   const unknownOverrides = Object.keys(overrides).filter(id => !roster.some(r => r.id === id));
+  const unknownRatings = Object.keys(ratings).filter(id => !roster.some(r => r.id === id));
   const doc = {
     generatedAt: now,
     sources: runs.map(r => r.health),
-    warnings: [...problems, ...unknownOverrides.map(id => `overrides.json: no race called "${id}"`)],
+    warnings: [
+      ...problems,
+      ...unknownRatings.map(id => `ratings.csv: no race called "${id}"`),
+      ...unknownOverrides.map(id => `overrides.json: no race called "${id}"`),
+    ],
     chambers: read('chambers.json'),
     closings,
     races,
