@@ -260,3 +260,14 @@ th { border-bottom: 1.5px solid var(--ink); font-family: var(--num); letter-spac
   .tally { flex-direction: column; align-items: flex-start; gap: 2px; }
   .tally.right { flex-direction: column-reverse; align-items: flex-end; text-align: right; }
 }
+.range { display: flex; align-items: center; gap: 8px; margin-bottom: 16px; font-size: .85rem; color: var(--ink-2); }
+.range-set { display: flex; min-width: 0; }
+.range button { font: inherit; font-size: .82rem; font-weight: 500; color: var(--ink-2); background: var(--raised); border: 1px solid var(--contour); margin-left: -1px; min-height: 36px; padding: 0 9px; cursor: pointer; white-space: nowrap; }
+.range button:first-child { margin-left: 0; border-radius: 3px 0 0 3px; }
+.range button:last-child { border-radius: 0 3px 3px 0; }
+.range button:hover { color: var(--ink); }
+.range button[aria-pressed="true"] { position: relative; color: var(--ground); background: var(--ink); border-color: var(--ink); font-weight: 600; }
+.range button:focus-visible { position: relative; z-index: 1; }
+@media (max-width: 400px) {
+  .range button { padding-inline: 5px; font-size: .78rem; }
+}

@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { test } from 'node:test';
 import { parseCnn, parseNpr, parseNyt } from '../scripts/lib/feeds.mjs';
-import { midPrices } from '../scripts/lib/markets.mjs';
+import { candlePoints, midPrices } from '../scripts/lib/markets.mjs';
 import { applyOverride, mergeRace } from '../scripts/lib/merge.mjs';
 import { nextRun } from '../scripts/lib/next-run.mjs';
 import { csvRows, parseRatings, resolveRating } from '../scripts/lib/ratings.mjs';
@@ -25,6 +25,15 @@ test('Run chain follows the schedule and stops after the runoffs', () => {
   assert.equal(at('2026-11-04T15:03:00Z'), '2026-11-04T15:07:00.000Z');
   assert.equal(at('2026-12-13T23:30:00Z'), '2026-12-14T00:07:00.000Z');
   assert.equal(nextRun(Date.parse('2026-12-14T00:10:00Z')), null);
+});
+
+test('Market history keeps only times every market has a price', () => {
+  const candle = (ts, bid, ask) => ({ end_period_ts: ts, yes_bid: { close_dollars: bid }, yes_ask: { close_dollars: ask } });
+  const points = candlePoints({
+    house: { D: [candle(2000, '0.90', '0.92'), candle(1000, '0.80', '0.82')], R: [candle(1000, '0.18', '0.20'), candle(2000, '0.08', '0.10')] },
+    senate: { D: [candle(1000, '0.60', '0.62'), candle(2000, '0.70', '0.72')], R: [candle(1000, '0.38', '0.40')] },
+  });
+  assert.deepEqual(points, [{ at: '1970-01-01T00:16:40.000Z', house: { D: 81, R: 19 }, senate: { D: 61, R: 39 } }]);
 });
 
 test('NYT parser reads a called race', () => {

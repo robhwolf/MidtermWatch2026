@@ -139,4 +139,5 @@ export const isStale = (generatedAt, nowMs) =>
 const ET = new Intl.DateTimeFormat('en-US', { timeZone: 'America/New_York', hour: 'numeric', minute: '2-digit' });
 const ET_DAY = new Intl.DateTimeFormat('en-US', { timeZone: 'America/New_York', month: 'short', day: 'numeric' });
 export const timeET = iso => `${ET.format(new Date(iso)).replace(':00', '').replace(' AM', ' am').replace(' PM', ' pm')} ET`;
+export const dayET = iso => ET_DAY.format(new Date(iso));
 export const dayTimeET = iso => `${ET_DAY.format(new Date(iso))}, ${timeET(iso)}`;

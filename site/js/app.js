@@ -1,5 +1,5 @@
 import {
-  RATING_ORDER, averageSwing, balance, bellwethers, dayTimeET, governors, isStale, isTossup, isUpset, isWatched,
+  RATING_ORDER, averageSwing, balance, bellwethers, dayET, dayTimeET, governors, isStale, isTossup, isUpset, isWatched,
   leader, margin, path, pollGroups, ratingParty, recentCalls, standing, staleLimitMinutes, swing, timeET,
 } from './model.js';
 import { SeatBar } from './seatbar.js';
@@ -294,7 +294,12 @@ function renderSwing() {
 const isSolidNoise = r => !r.baseline?.likeForLike;
 
 /* Prediction markets */
+const RANGES = [['6 hours', 6], ['24 hours', 24], ['2 weeks', 336], ['30 days', 720], ['6 months', 4392]];
+let marketRange = 24;
+let marketDoc = null;
+
 function marketChart(points, key, title) {
+  const stamp = marketRange > 24 ? dayET : marketRange === 24 ? dayTimeET : timeET;
   const W = 480, H = 170, L = 34, R = 14, T = 10, B = 24;
   const t0 = Date.parse(points[0].at), t1 = Date.parse(points.at(-1).at);
   const x = at => L + ((Date.parse(at) - t0) / Math.max(1, t1 - t0)) * (W - L - R);
@@ -308,8 +313,8 @@ function marketChart(points, key, title) {
       <span class="read">${pty('D')} ${last.D}% &nbsp; ${pty('R')} ${last.R}%</span></figcaption>
     <svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${title}: Democrats ${last.D} percent, Republicans ${last.R} percent">
       ${grid}
-      <text x="${L}" y="${H - 6}">${timeET(points[0].at)}</text>
-      <text x="${W - R}" y="${H - 6}" text-anchor="end">${timeET(points.at(-1).at)}</text>
+      <text x="${L}" y="${H - 6}">${stamp(points[0].at)}</text>
+      <text x="${W - R}" y="${H - 6}" text-anchor="end">${stamp(points.at(-1).at)}</text>
       <path d="${line('D')}" fill="none" stroke="var(--d)" stroke-width="2"/>
       <path d="${line('R')}" fill="none" stroke="var(--r)" stroke-width="2"/>
       ${end('D')}${end('R')}
@@ -317,12 +322,25 @@ function marketChart(points, key, title) {
     </svg></figure>`;
 }
 
+function renderRanges() {
+  $('market-range').innerHTML = `<span>Past</span><div class="range-set">${RANGES.map(([label, hours]) =>
+    `<button type="button" data-hours="${hours}" aria-label="Past ${label}" aria-pressed="${hours === marketRange}">${label}</button>`).join('')}</div>`;
+}
+
 function renderMarkets(m) {
-  const points = m?.points || [];
-  $('markets').hidden = points.length < 2;
-  if (points.length < 2) return;
+  marketDoc = m;
+  const all = m?.points || [];
+  $('markets').hidden = all.length < 2;
+  if (all.length < 2) return;
+  const since = Date.parse(all.at(-1).at) - marketRange * 3600000;
+  const points = all.filter(p => Date.parse(p.at) >= since);
+  if (points.length < 2) {
+    $('market-chart').innerHTML = `<p class="empty">No prices in this timeframe yet. Try a longer one.</p>`;
+    return;
+  }
+  const history = m.backfilled ? ` Earlier prices are Kalshi's hourly closes for the past month and daily closes before that.` : '';
   $('market-chart').innerHTML = `<div class="markets">${marketChart(points, 'house', 'House control')}${marketChart(points, 'senate', 'Senate control')}</div>
-    <p class="cook-note">${link(m.sourceUrl, m.source)}, midpoint of the bid and ask. Last updated ${dayTimeET(points.at(-1).at)}.</p>`;
+    <p class="cook-note">${link(m.sourceUrl, m.source)}, midpoint of the bid and ask. Last updated ${dayTimeET(points.at(-1).at)}.${history}</p>`;
   document.querySelectorAll('.market').forEach(fig => {
     const svg = fig.querySelector('svg'), hair = fig.querySelector('.hair'), read = fig.querySelector('.read'), key = fig.dataset.key;
     const reset = read.innerHTML;
@@ -333,11 +351,20 @@ function renderMarkets(m) {
       const target = Date.parse(points[0].at) + share * (Date.parse(points.at(-1).at) - Date.parse(points[0].at));
       const d = points.reduce((a, b) => (Math.abs(Date.parse(b.at) - target) < Math.abs(Date.parse(a.at) - target) ? b : a));
       hair.hidden = false; hair.setAttribute('x1', px); hair.setAttribute('x2', px);
-      read.innerHTML = `${timeET(d.at)} &nbsp; ${pty('D')} ${d[key].D}% &nbsp; ${pty('R')} ${d[key].R}%`;
+      read.innerHTML = `${(marketRange >= 24 ? dayTimeET : timeET)(d.at)} &nbsp; ${pty('D')} ${d[key].D}% &nbsp; ${pty('R')} ${d[key].R}%`;
     });
     svg.addEventListener('pointerleave', () => { hair.hidden = true; read.innerHTML = reset; });
   });
 }
+
+renderRanges();
+$('market-range').addEventListener('click', e => {
+  const button = e.target.closest('button');
+  if (!button) return;
+  marketRange = Number(button.dataset.hours);
+  $('market-range').querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', b === button));
+  renderMarkets(marketDoc);
+});
 
 async function loadMarkets() {
   try {
