@@ -153,7 +153,8 @@ test('Poll closing filter includes the chosen time and earlier', () => {
     IN: { first: '2026-11-03T23:00:00.000Z', last: '2026-11-04T00:00:00.000Z' },
     OH: { first: '2026-11-04T00:30:00.000Z', last: '2026-11-04T00:30:00.000Z' },
   } };
-  assert.equal(closesBy({ state: 'IN' }, closings, '2026-11-03T23:00:00.000Z'), true);
+  assert.equal(closesBy({ state: 'IN' }, closings, '2026-11-04T00:00:00.000Z'), true);
+  assert.equal(closesBy({ state: 'IN' }, closings, '2026-11-03T23:00:00.000Z'), false);
   assert.equal(closesBy({ state: 'OH' }, closings, '2026-11-04T00:30:00.000Z'), true);
   assert.equal(closesBy({ state: 'OH' }, closings, '2026-11-04T00:00:00.000Z'), false);
   assert.equal(closesBy({ state: 'ZZ' }, closings, '2026-11-04T00:00:00.000Z'), false);

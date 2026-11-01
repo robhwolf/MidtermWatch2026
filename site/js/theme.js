@@ -1,12 +1,11 @@
-// The light/dark switch. With nothing saved the page follows the device. The
+// The light/dark switch. The page is light until a reader chooses dark. The
 // inline script in index.html applies a saved choice before the first paint.
 
 const GROUND = { light: '#f8f3e9', dark: '#2b2018' };
 const root = document.documentElement;
-const device = matchMedia('(prefers-color-scheme: dark)');
 const button = document.getElementById('theme');
 
-const current = () => root.dataset.theme || (device.matches ? 'dark' : 'light');
+const current = () => root.dataset.theme || 'light';
 
 function sync() {
   const dark = current() === 'dark';
@@ -23,5 +22,4 @@ button.addEventListener('click', () => {
   try { localStorage.setItem('theme', root.dataset.theme); } catch {}
   sync();
 });
-device.addEventListener('change', sync);
 sync();

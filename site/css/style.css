@@ -21,16 +21,6 @@
   --text: "Source Sans 3", system-ui, -apple-system, "Segoe UI", sans-serif;
   --gutter: clamp(16px, 4vw, 32px);
 }
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    color-scheme: dark;
-    --ground: #2b2018; --raised: #37291e; --ink: #f0e5d2; --ink-2: #cdbda5; --ink-3: #b3a28b;
-    --rule: #4d3d2f; --contour: #a98b62;
-    --d: #5a9bd0; --r: #d9705f; --i: #ad9dcc; --d-soft: #38668a; --r-soft: #8c4d42;
-    --d-wash: #223342; --r-wash: #40261f; --toss: #94803f;
-    --warn-bg: #4a3a1c; --warn-ink: #f2dfb0; --pencil: #e5a35a;
-  }
-}
 :root[data-theme="dark"] {
   color-scheme: dark;
   --ground: #2b2018; --raised: #37291e; --ink: #f0e5d2; --ink-2: #cdbda5; --ink-3: #b3a28b;

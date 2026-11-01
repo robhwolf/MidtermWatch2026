@@ -453,8 +453,9 @@ function initStates() {
 }
 
 function initClosings() {
+  const times = [...new Set(Object.values(doc.closings.states).map(s => s.last))].sort();
   $('filters').elements.closing.innerHTML = `<option value="">All</option>`
-    + pollGroups(doc.races, doc.closings).map(g => `<option value="${g.at}">By ${timeET(g.at)}</option>`).join('');
+    + times.map(at => `<option value="${at}">By ${timeET(at)}</option>`).join('');
 }
 
 initControls();
