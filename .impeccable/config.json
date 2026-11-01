@@ -11,6 +11,15 @@
         ],
         "createdAt": "2026-11-01T05:35:25.342Z",
         "reason": "Agent: false positive; sections have 40px top padding under the ruler rule, which the detector misses"
+      },
+      {
+        "rule": "cream-palette",
+        "value": "*",
+        "files": [
+          "site/index.html"
+        ],
+        "createdAt": "2026-11-01T20:29:56.885Z",
+        "reason": "User chose the brown and cream Linen palette"
       }
     ]
   }
