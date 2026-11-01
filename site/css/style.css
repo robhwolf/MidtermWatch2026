@@ -193,13 +193,13 @@ summary { cursor: pointer; font-weight: 500; color: var(--ink); }
 
 @media (max-width: 640px) {
   .hide-sm { display: none; }
-  .goal span { font-size: .68rem; max-width: 15ch; }
+  .goal span { font-size: .75rem; max-width: 15ch; }
   .tally small { font-size: .78rem; white-space: nowrap; }
   .fn { display: none; }
   td, th { padding-inline: 4px; }
   table { font-size: .86rem; }
   .race-name { white-space: normal; }
-  .rate { padding-inline: 5px; font-size: .72rem; }
+  .rate { padding-inline: 5px; font-size: .75rem; }
   .cand { gap: 4px; }
 }
 @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
@@ -235,3 +235,17 @@ th { border-bottom: 1.5px solid var(--ink); font-family: var(--num); letter-spac
 .wave.past::before { background: var(--ink); }
 .wave-time { font-weight: 700; }
 .dumb .then { box-shadow: inset 0 0 0 2px var(--ink-2); }
+.updated.late { background: var(--warn-bg); color: var(--warn-ink); font-weight: 600; padding: 1px 6px; border-radius: 3px; }
+.bar-key { display: flex; gap: 14px; font-size: .8rem; color: var(--ink-2); margin-top: 2px; }
+.bar-key span { display: inline-flex; align-items: center; gap: 5px; }
+.bar-key i { width: 18px; height: 10px; border: 1px solid var(--ink); }
+.bar-key .solid { background: var(--ink-2); }
+.bar-key .hatch { background: repeating-linear-gradient(135deg, var(--ink-2) 0 2px, var(--raised) 2px 4px); }
+.bar-key .open { background: var(--raised); }
+.cook-ends { display: flex; justify-content: space-between; font-size: .8rem; color: var(--ink-3); margin-top: 2px; }
+.cook-note { font-size: .82rem; }
+.bells { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr)); gap: 0 28px; }
+.watch .bell-row { display: grid; grid-template-columns: auto 1fr auto; gap: 8px; align-items: center; padding: 6px 0; background: none; box-shadow: none; border-radius: 0; border-bottom: 1px solid var(--rule); font-size: .92rem; }
+.bell-row strong { font-weight: 600; }
+.bell-row b { font-weight: 600; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.pty.none { background: var(--toss); }

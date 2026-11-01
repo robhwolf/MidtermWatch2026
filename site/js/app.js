@@ -48,13 +48,16 @@ const limitText = m => (m >= 60 ? `${m / 60}-hour` : `${m}-minute`);
 function renderStatus() {
   const now = Date.now();
   const at = doc?.generatedAt;
-  $('updated').textContent = at ? `Updated ${dayTimeET(at)}` : 'Waiting for the first update';
+  const age = at ? Math.round((now - Date.parse(at)) / 60000) : 0;
+  const ageText = age >= 120 ? `${Math.round(age / 60)} hours` : `${age} minutes`;
+  const stale = !!at && !doc.sample && isStale(at, now);
+  $('updated').textContent = at ? `Updated ${dayTimeET(at)}${stale ? ` · ${ageText} old` : ''}` : 'Waiting for the first update';
+  $('updated').classList.toggle('late', stale || !!loadError);
   const alerts = [];
-  if (doc?.sample) alerts.push(`Sample data. Every number on this page is invented for testing. <a href="./">See live results</a>`);
+  if (doc?.sample) alerts.push(`Sample data, invented for testing. <a href="./">Live results</a>`);
   if (loadError) alerts.push('Could not reach the latest results. Showing the last ones loaded.');
-  if (at && !doc.sample && isStale(at, now)) {
-    const mins = Math.round((now - Date.parse(at)) / 60000);
-    alerts.push(`These results are ${mins >= 120 ? `${Math.round(mins / 60)} hours` : `${mins} minutes`} old, past the ${limitText(staleLimitMinutes(now))} limit. The update job may be delayed.`);
+  if (stale) {
+    alerts.push(`These results are ${ageText} old, past the ${limitText(staleLimitMinutes(now))} limit. The update job may be delayed.`);
   }
   const down = (doc?.sources || []).filter(s => !s.ok && s.role === 'feed');
   if (down.length) alerts.push(`Source down: ${down.map(s => esc(s.name)).join(', ')}. Using the backup.`);
@@ -86,7 +89,7 @@ function renderBalance() {
     bars[key].set(b);
     const flips = b.flips.D + b.flips.R;
     const other = b.won.I + b.leading.I;
-    el.querySelector('.foot-slot').innerHTML = `<div class="chamber-foot">
+    el.querySelector('.foot-slot').innerHTML = `${key === 'house' ? BAR_KEY : ''}<div class="chamber-foot">
       <span><strong>${b.uncalled}</strong> uncalled${other ? ` · <strong>${other}</strong> independent` : ''}${key === 'senate' ? ` · ${b.holdover.D + b.holdover.R} not up this year` : ''}</span>
       <span>${flips ? `Flipped: <strong>${b.flips.D} to D, ${b.flips.R} to R</strong>` : 'No seats flipped yet'}</span></div>${cookStrip(key)}`;
   }
@@ -104,6 +107,8 @@ function renderBalance() {
     : `<p>No races called yet. First polls close at 6 pm ET on Tuesday.</p>`);
 }
 
+const BAR_KEY = `<div class="bar-key" aria-hidden="true"><span><i class="solid"></i>Called</span><span><i class="hatch"></i>Leading</span><span><i class="open"></i>Uncalled</span></div>`;
+
 function cookStrip(chamber) {
   const list = doc.races.filter(r => r.chamber === chamber);
   const rated = list.filter(r => r.cook?.rating && !r.cook.assumed);
@@ -112,8 +117,7 @@ function cookStrip(chamber) {
     const n = list.filter(r => r.cook?.rating === k).length;
     return n ? `<i title="${k}: ${n}" style="flex:${n};background:${ratingColors(k)[0]}"></i>` : '';
   }).join('');
-  const assumed = list.filter(r => r.cook?.assumed).length;
-  return `<div class="cook-strip" aria-hidden="true">${seg}</div><p class="cook-note">Cook ratings, safest Democratic to safest Republican: ${rated.length} entered${assumed ? `, ${assumed} assumed Solid for the seat holder` : ''}.</p>`;
+  return `<div class="cook-strip" aria-hidden="true">${seg}</div><div class="cook-ends"><span>Safe D</span><span>Cook ratings</span><span>Safe R</span></div>`;
 }
 
 /* Table */
@@ -171,7 +175,7 @@ function detailRow(r) {
 
 function renderTable() {
   const list = doc.races.filter(matches).sort(SORTS[sortKey]);
-  $('count').textContent = `${plural(list.length, 'race')}${filters.rating === 'competitive' ? ', competitive ratings only' : ''}`;
+  $('count').textContent = `${plural(list.length, 'race')}${filters.rating === 'competitive' && doc.races.some(r => r.cook?.rating && !r.cook.assumed) ? ', competitive ratings only' : ''}`;
   const head = [['race', 'Race'], [null, 'Cook'], [null, 'Leader'], ['margin', 'Margin'], ['reporting', 'In'], [null, 'Status']];
   const cls = ['', '', '', 'n', 'n hide-sm', 'hide-sm'];
   const th = head.map(([k, t], i) => `<th scope="col" class="${cls[i]}"${k && sortKey === k ? ' aria-sort="ascending"' : ''}>${k ? `<button data-sort="${k}">${t}</button>` : t}</th>`).join('');
@@ -242,8 +246,9 @@ function renderTimeline() {
   const first = bellwethers(groups);
   $('bells').innerHTML = first.length ? first.map(r => {
     const s = standing(r);
+    const lead = s.party || (r.cook.rating === 'Toss-up' ? null : r.cook.rating.slice(-1));
     const st = s.kind === 'won' ? `${s.party} won` : r.votes ? signed(margin(r)) : 'Waiting';
-    return `<li class="bell">${esc(raceName(r))} <span class="sub" style="display:inline">${esc(r.cook.rating)}, ${timeET(doc.closings.states[r.state].first)} · ${st}</span></li>`;
+    return `<li class="bell-row">${lead ? pty(lead) : '<span class="pty none"></span>'}<span><strong>${esc(raceName(r))}</strong><span class="sub">${esc(r.cook.rating)}, ${timeET(doc.closings.states[r.state].first)}</span></span><b>${st}</b></li>`;
   }).join('') : '<li class="plain">Bellwethers appear once Cook ratings are entered.</li>';
 }
 
