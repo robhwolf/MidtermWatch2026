@@ -96,7 +96,7 @@ export function averageSwing(races) {
 export function pollGroups(races, closings) {
   const groups = new Map();
   for (const [state, c] of Object.entries(closings.states)) {
-    const key = c.first;
+    const key = c.last;
     if (!groups.has(key)) groups.set(key, { at: key, states: [] });
     groups.get(key).states.push({
       ...c,

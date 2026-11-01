@@ -6,7 +6,7 @@ import { candlePoints, midPrices } from '../scripts/lib/markets.mjs';
 import { applyOverride, mergeRace } from '../scripts/lib/merge.mjs';
 import { nextRun } from '../scripts/lib/next-run.mjs';
 import { csvRows, parseRatings, resolveRating } from '../scripts/lib/ratings.mjs';
-import { averageSwing, balance, closesBy, isStale, isUpset, margin, path, staleLimitMinutes, timeET } from '../site/js/model.js';
+import { averageSwing, balance, closesBy, isStale, pollGroups, isUpset, margin, path, staleLimitMinutes, timeET } from '../site/js/model.js';
 
 const NIGHT = '2026-11-04T02:00:00.000Z';
 const rec = (o = {}) => ({
@@ -158,6 +158,14 @@ test('Poll closing filter includes the chosen time and earlier', () => {
   assert.equal(closesBy({ state: 'OH' }, closings, '2026-11-04T00:30:00.000Z'), true);
   assert.equal(closesBy({ state: 'OH' }, closings, '2026-11-04T00:00:00.000Z'), false);
   assert.equal(closesBy({ state: 'ZZ' }, closings, '2026-11-04T00:00:00.000Z'), false);
+});
+
+test('Timeline groups a two-closing state at its later time', () => {
+  const groups = pollGroups([], { states: {
+    IN: { first: '2026-11-03T23:00:00.000Z', last: '2026-11-04T00:00:00.000Z' },
+    VT: { first: '2026-11-04T00:00:00.000Z', last: '2026-11-04T00:00:00.000Z' },
+  } });
+  assert.deepEqual(groups.map(g => [g.at, g.states.length]), [['2026-11-04T00:00:00.000Z', 2]]);
 });
 
 test('ratings CSV forgives spelling and reports the rest', () => {

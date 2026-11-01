@@ -230,8 +230,8 @@ function renderTimeline() {
       placedNow = true;
     }
     const names = g.states.map(s => {
-      const later = s.closes.length > 1 ? ` <span class="split">(last ${timeET(s.last)})</span>` : '';
-      return `<span title="${esc(s.closes.map(c => `${timeET(c.at)}: ${c.area}`).join('; '))}">${esc(s.state)}${later}</span>`;
+      const earlier = s.closes.length > 1 ? ` <span class="split">(first ${timeET(s.first)})</span>` : '';
+      return `<span title="${esc(s.closes.map(c => `${timeET(c.at)}: ${c.area}`).join('; '))}">${esc(s.state)}${earlier}</span>`;
     }).join('');
     const watch = g.states.flatMap(s => s.races);
     const list = watch.map(r => {
@@ -250,7 +250,7 @@ function renderTimeline() {
     const s = standing(r);
     const lead = s.party || (r.cook.rating === 'Toss-up' ? null : r.cook.rating.slice(-1));
     const st = s.kind === 'won' ? `${s.party} won` : r.votes ? signed(margin(r)) : 'Waiting';
-    return `<li class="bell-row">${lead ? pty(lead) : '<span class="pty none"></span>'}<span><strong>${esc(raceName(r))}</strong><span class="sub">${esc(r.cook.rating)}, ${timeET(doc.closings.states[r.state].first)}</span></span><b>${st}</b></li>`;
+    return `<li class="bell-row">${lead ? pty(lead) : '<span class="pty none"></span>'}<span><strong>${esc(raceName(r))}</strong><span class="sub">${esc(r.cook.rating)}, ${timeET(doc.closings.states[r.state].last)}</span></span><b>${st}</b></li>`;
   }).join('') : '<li class="plain">Bellwethers appear once Cook ratings are entered.</li>';
 }
 
@@ -453,9 +453,8 @@ function initStates() {
 }
 
 function initClosings() {
-  const times = [...new Set(Object.values(doc.closings.states).map(s => s.last))].sort();
   $('filters').elements.closing.innerHTML = `<option value="">All</option>`
-    + times.map(at => `<option value="${at}">By ${timeET(at)}</option>`).join('');
+    + pollGroups(doc.races, doc.closings).map(g => `<option value="${g.at}">By ${timeET(g.at)}</option>`).join('');
 }
 
 initControls();
