@@ -7,6 +7,7 @@
 <meta name="description" content="House, Senate and governor races in the 2026 midterms, read against Cook's ratings.">
 <meta name="theme-color" content="#f8f3e9" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#2b2018" media="(prefers-color-scheme: dark)">
+<script>try { const t = localStorage.getItem('theme'); if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t; } catch {}</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo+Narrow:wght@500;700&family=Source+Sans+3:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -18,6 +19,10 @@
   <div class="wrap mast-row">
     <h1>Midterm Watch <span>2026</span></h1>
     <p id="updated" class="updated" aria-live="polite">Loading results</p>
+    <button id="theme" class="theme" type="button" aria-label="Switch theme">
+      <svg class="moon" viewBox="0 0 20 20" aria-hidden="true"><path d="M16.5 12.4A7 7 0 0 1 7.6 3.5a7 7 0 1 0 8.9 8.9Z"/></svg>
+      <svg class="sun" viewBox="0 0 20 20" aria-hidden="true" hidden><circle cx="10" cy="10" r="3.6"/><path d="M10 1.8v2.4M10 15.8v2.4M1.8 10h2.4M15.8 10h2.4M4.2 4.2l1.7 1.7M14.1 14.1l1.7 1.7M4.2 15.8l1.7-1.7M14.1 5.9l1.7-1.7"/></svg>
+    </button>
   </div>
   <nav class="wrap jump" aria-label="Sections">
     <a href="#balance">Seats</a>

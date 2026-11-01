@@ -59,7 +59,12 @@ section#balance { border-top: 0; padding-top: 20px; }
 .mast-row { display: flex; align-items: baseline; justify-content: space-between; gap: 4px 16px; flex-wrap: wrap; padding-top: 10px; }
 .mast h1 { font: 800 1.6rem/1.1 var(--num); letter-spacing: 0.005em; text-transform: uppercase; margin: 0; }
 .mast h1 span { color: var(--ink-3); }
-.updated { margin: 0; font-size: .85rem; color: var(--ink-2); }
+.updated { margin: 0 0 0 auto; font-size: .85rem; color: var(--ink-2); }
+.theme { position: relative; align-self: center; flex: none; display: grid; place-items: center; width: 32px; height: 32px; padding: 0; color: var(--ink-2); background: none; border: 1px solid var(--contour); border-radius: 3px; cursor: pointer; }
+.theme::after { content: ""; position: absolute; inset: -6px; }
+.theme:hover { color: var(--ink); background: var(--raised); }
+.theme svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+.theme svg[hidden] { display: none; }
 .jump { display: flex; gap: 18px; overflow-x: auto; scrollbar-width: none; padding-block: 6px 8px; font-size: .9rem; font-weight: 500; }
 .jump a { text-decoration: none; color: var(--ink-2); white-space: nowrap; }
 .jump a:hover { color: var(--ink); text-decoration: underline; }
@@ -193,6 +198,8 @@ summary { cursor: pointer; font-weight: 500; color: var(--ink); }
 
 @media (max-width: 640px) {
   .hide-sm { display: none; }
+  .mast-row { align-items: center; }
+  .updated { order: 1; flex-basis: 100%; margin-left: 0; }
   .goal span { font-size: .75rem; max-width: 15ch; }
   .tally small { font-size: .78rem; white-space: nowrap; }
   .fn { display: none; }
@@ -249,3 +256,7 @@ th { border-bottom: 1.5px solid var(--ink); font-family: var(--num); letter-spac
 .bell-row strong { font-weight: 600; }
 .bell-row b { font-weight: 600; white-space: nowrap; font-variant-numeric: tabular-nums; }
 .pty.none { background: var(--toss); }
+@media (max-width: 480px) {
+  .tally { flex-direction: column; align-items: flex-start; gap: 2px; }
+  .tally.right { flex-direction: column-reverse; align-items: flex-end; text-align: right; }
+}

@@ -104,7 +104,7 @@ components:
 
 **Creative North Star: "The Survey Sheet"**
 
-The page is a results sheet drawn like a topographic quad: linen paper, brown ink, a muted slate blue and brick red for the two parties. Counts are read off scale bars the way distance is read off a map's scale, not off KPI cards. Every section opens on a heavy ruler rule and a legend-style heading with a short tick ruler under it. Dark mode is Walnut, the same sheet by lamplight, with the same hues lifted for contrast.
+The page is a results sheet drawn like a topographic quad: linen paper, brown ink, a muted slate blue and brick red for the two parties. Counts are read off scale bars the way distance is read off a map's scale, not off KPI cards. Every section opens on a heavy ruler rule and a legend-style heading with a short tick ruler under it. Dark mode is Walnut, the same sheet by lamplight, with the same hues lifted for contrast. The page follows the device until the reader uses the header switch, which is saved in their browser.
 
 The density is that of a newspaper results table: hairline rules between rows, no card chrome, no ambient decoration. There are no background contour lines and no map; the survey language lives only in functional marks (scale bar, benchmark, ruler rules, dashed trail, pencil ring). The palette is brown and cream rather than green; the outdoorsy-map look and the KPI-card dashboard are both refused.
 

@@ -26,7 +26,7 @@ export class SeatBar {
     this.c = canvas; this.b = null; this.t = -1;
     this.quiet = matchMedia('(prefers-reduced-motion: reduce)').matches;
     new ResizeObserver(() => this.draw()).observe(canvas);
-    matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => this.draw());
+    addEventListener('themechange', () => this.draw());
     const tip = document.querySelector('.tip') || Object.assign(document.body.appendChild(document.createElement('div')), { className: 'tip', hidden: true });
     canvas.addEventListener('pointermove', e => {
       const seat = this.seq?.[Math.floor((e.offsetX / canvas.clientWidth) * this.seq.length)];
